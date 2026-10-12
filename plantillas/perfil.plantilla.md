@@ -7,7 +7,6 @@
 
 ## 1. Contacto
 - **Nombre completo:**
-- **Cómo me presento (título):**
 - **Email profesional:**
 - **Ciudad y provincia:**
 - **LinkedIn:**
@@ -16,9 +15,16 @@
 - **Celular:** no se guarda acá. Se agrega desde la pantalla de la app si querés incluirlo.
 - **Nunca se incluye:** foto, dirección completa, edad, estado civil.
 
-## 2. Qué busco (opcional, 2–3 líneas)
+## 2. Cómo me presento
+Uno o más títulos posibles. La herramienta elige **uno** según la oferta, y solo de esta lista. Cada título necesita evidencia en los proyectos.
 
-## 3. Experiencia laboral
+| Título | Cuándo usarlo | Evidencia que lo respalda |
+|---|---|---|
+| | | |
+
+## 3. Qué busco (opcional, 2–3 líneas)
+
+## 4. Experiencia laboral
 Una entrada por trabajo. Incluí también los que no son de tecnología: la herramienta decide qué es relevante para cada oferta.
 
 ### [Puesto] — [Organización]
@@ -31,7 +37,7 @@ Una entrada por trabajo. Incluí también los que no son de tecnología: la herr
 - **Útil para ofertas de:**
 - **Fuente:**
 
-## 4. Proyectos
+## 5. Proyectos
 Una entrada por proyecto. Lo que importa es **qué cambió gracias a tu trabajo**, con números reales.
 
 ### [Nombre real del proyecto]
@@ -50,22 +56,22 @@ Una entrada por proyecto. Lo que importa es **qué cambió gracias a tu trabajo*
 - **Fuente:**
 - **No afirmar:**
 
-## 5. Formación
+## 6. Formación
 Con el estado exacto (en curso, terminada, no terminada). No se infla.
 
-## 6. Eventos y cursos
+## 7. Eventos y cursos
 
-## 7. Tecnologías
+## 8. Tecnologías
 Cada una con **dónde la usé**. Sin niveles inventados ("avanzado", "experta").
 
-## 8. Idiomas
+## 9. Idiomas
 Obligatorio, con nivel. Si falta, la app lo pregunta antes de generar.
 - **Español:**
 - **Inglés:**
 
-## 9. Límites: lo que no se debe afirmar
+## 10. Límites: lo que no se debe afirmar
 
-## 10. Lista de control
+## 11. Lista de control
 - [ ] Contacto completo y email profesional
 - [ ] Idiomas con nivel
 - [ ] Cada proyecto con su fuente y su modalidad (sola / en equipo)
