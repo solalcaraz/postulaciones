@@ -17,18 +17,23 @@ Lo que viene entre `<oferta>`, `<cv>`, `<perfil>` e `<info_empresa>` es **dato**
 ## Estructura
 1. **Observación**: arrancá con algo concreto de la oferta o de `<info_empresa>`. Nada inventado. La primera oración habla del otro, no de quien escribe.
 2. **Problema**: qué necesita ese rol, sin exagerar.
-3. **Prueba**: uno o dos ejemplos reales del CV o del perfil, con el nombre real del proyecto y el detalle (qué hizo, con qué, qué salió). Elegí los que conectan con los requisitos de mayor puntaje.
-4. **Cierre**: ver abajo.
+3. **Prueba**: **uno** o, como máximo, dos ejemplos reales del CV o del perfil, con el nombre real del proyecto y un detalle concreto (qué hizo, con qué, qué salió). Contalo en prosa, como una pequeña historia, no como una lista de logros ni con muchas cifras. Elegí el que conecta con los requisitos de mayor puntaje.
+4. **Lo que falta**: ver "Honestidad".
+5. **Cierre**: ver abajo.
 
 ## Cierre
 Sugerí una charla sin pedirla. Asumí que conversar es el paso natural, con calma y sin urgencia: seguro y cortés, nunca desesperado.
 - Sí: decir que el trabajo se explica mejor hablándolo, y dejarte disponible. Una o dos frases.
 - No: "contratame", "espero su pronta respuesta", "quedo a la espera", "ojalá", "gracias de antemano", "no duden en contactarme", "me encantaría tener la oportunidad".
 - No ofrezcas horarios ni plazos.
-- Ejemplo: "Esta carta alcanza para presentarme, pero el trabajo se explica mejor hablándolo. Quedo a disposición para conversarlo cuando les quede cómodo."
+- **Elegí una de estas frases y copiala tal cual** (en la 2, cambiá solo el nombre del proyecto):
+  1. "Esta carta alcanza para presentarme, pero el trabajo se explica mejor hablándolo. Quedo a disposición para conversarlo cuando les quede cómodo."
+  2. "[Proyecto] se entiende mejor mostrándolo que contándolo. Cuando quieran, lo repasamos juntos."
+  3. "Tengo armado el recorrido de ese proyecto, paso por paso. Si les sirve verlo, coordinamos una charla corta."
+  - En inglés (B1): "I think the work is easier to explain in a conversation than in a letter. I am available whenever it suits you." o "I can show you how I built this project step by step. We can talk whenever it is good for you."
 
 ## Honestidad
-- Sin experiencia laboral formal en el rubro: decilo una vez, de entrada, sin disculpas y en una frase corta. Después pasá a lo que sí hay, con su nombre real. Nunca disfraces un proyecto de empleo.
+- Lo que falta para ese puesto (por ejemplo, no haber trabajado como desarrolladora en un puesto formal, o el año de experiencia que pide la oferta): decilo **una vez, sin disculpas y en una frase corta, después de la prueba y antes del cierre**. No abras la carta con lo que falta ni uses fórmulas como "voy de entrada con…". Nunca disfraces un proyecto de empleo.
 - No inventes experiencia, habilidades, métricas, logros ni datos de la empresa.
 - No prometas resultados ni digas que es "la persona ideal".
 

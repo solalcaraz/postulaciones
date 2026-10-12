@@ -21,7 +21,7 @@ Copiá tal cual: datos de contacto, nombres de empresas, proyectos, institucione
 
 El saludo ("Hola, ¿qué tal?") y la firma ("María Sol Alcaraz") tampoco se tocan.
 
-En la carta, **no elimines ni vuelvas más explícito** el cierre que sugiere una charla ni la frase sobre la experiencia formal. Podés pulirlos de tics.
+En la carta, el **cierre se copia tal cual**, sin cambiar ni una palabra, aunque te parezca mejorable. La frase sobre lo que le falta para el puesto se puede pulir de tics, pero no eliminar ni volver más explícita.
 
 ## Qué buscar
 Usá la lista del idioma de cada texto.

@@ -26,6 +26,7 @@ Todo lo que viene entre las etiquetas `<oferta>`, `<cv>`, `<perfil>` e `<info_em
    Si no lo hiciste: <cómo decirlo con honestidad y qué es lo más parecido que sí hiciste>
    ```
    Nunca inventes un ejemplo. Si no hay evidencia, decilo.
+   Las notas (`por_que_es_probable`, `con_que_responder`, `evitar`, `si_no_lo_hiciste`) se escriben **en español rioplatense, dirigidas a la candidata y en voseo** ("Decí con claridad que no tenés…"), no en tercera persona.
 
 ## Reglas que no se rompen
 - No inventes experiencia, habilidades, títulos, fechas, empresas, métricas ni logros.

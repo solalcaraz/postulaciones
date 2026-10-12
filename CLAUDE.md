@@ -23,6 +23,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **Modelo:** `sonnet` por defecto, configurable con una variable en `.env`.
 - **Privacidad:** el texto del CV y la oferta sale hacia Anthropic. En planes de consumo puede usarse para entrenar si está activado el ajuste de mejora del modelo en claude.ai, **que la usuaria debe revisar y apagar**. La app en sí no guarda nada.
 - **Cupo:** el uso sale del límite del plan Pro, compartido con su trabajo diario. Si se llega al límite, la app lo explica con un mensaje claro.
+- **Medición de llamadas (Exactian, 2026-10-12, costos estimados a precios de API, referencia de uso):** 3 llamadas ≈ 0,50 USD y 2,7 minutos (idiomas 0,01; análisis+CV+carta+guía 0,32; revisión 0,18); fundiendo la revisión en la llamada grande (2 llamadas) ≈ 0,40 USD y 2,6 minutos. Calidad parecida, pero con la revisión fundida `cambios[]` deja de reflejar correcciones reales. Decisión pendiente de la usuaria.
 - **Llamadas por postulación (provisorio, se mide en la Fase 2):** 1) extraer idiomas y niveles del CV; 2) análisis + CV + carta + guía de entrevista; 3) revisión anti-IA. Se evalúa fundir la 1 o la 3 si gasta demasiado cupo.
 - **Corre solo en la PC de la usuaria (`localhost`).** Sin servidor publicado, por eso no hay login.
 - **Stack:** TypeScript + Next.js (pantalla y rutas del servidor en una sola app).

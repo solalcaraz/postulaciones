@@ -26,10 +26,20 @@ export async function pasoIdiomas({ cv, oferta }) {
   return [bloque('instrucciones', instrucciones), bloque('cv', cv), bloque('oferta', oferta), cierre].join('\n\n');
 }
 
-export async function pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSalida, niveles }) {
-  const instrucciones = (await Promise.all(['00-comun', '01-analisis-reclutador', '02-cv', '03-carta'].map(n => leer(`prompts/${n}.md`)))).join('\n\n---\n\n');
+// `fundir` hace la revisión anti-IA dentro de la misma llamada que escribe (variante de 2 llamadas en lugar de 3).
+export async function pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSalida, niveles, fundir = false }) {
+  const archivos = ['00-comun', '01-analisis-reclutador', '02-cv', '03-carta'];
+  if (fundir) archivos.push('04-revision-anti-ia');
+  let instrucciones = (await Promise.all(archivos.map(n => leer(`prompts/${n}.md`)))).join('\n\n---\n\n');
+  const extras = [];
+  if (fundir) {
+    instrucciones += '\n\n---\n\n## En esta llamada también hacés la revisión anti-IA\nEscribí `cv`, `carta` y `preparacion_entrevista` y, **antes de responder**, revisalos con las reglas del prompt 04. En esta llamada, `<cv_generado>`, `<carta>` y `<guia>` son tu propio borrador, y `<cv_original>` es `<cv>`. Devolvé ya los textos revisados y completá `cambios[]` y `sin_arreglar[]`.';
+    extras.push(bloque('lista_de_muletillas', await leer(idiomaSalida === 'en' ? 'prompts/listas/muletillas-en.md' : 'prompts/listas/muletillas-es.md')));
+    extras.push(bloque('palabras_simples', await leer('prompts/listas/palabras-simples.md')));
+  }
   return [
     bloque('instrucciones', instrucciones),
+    ...extras,
     bloque('guia_de_nivel', await guiaDeNivel(niveles[idiomaSalida])),
     bloque('idioma_de_salida', idiomaSalida),
     bloque('niveles_confirmados', textoNiveles(niveles)),

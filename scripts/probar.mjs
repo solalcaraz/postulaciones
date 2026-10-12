@@ -4,12 +4,13 @@
 //        --cv datos-privados/cv-desarrollo.txt --perfil datos-privados/perfil.md --niveles es=nativo,en=B1
 //
 // Opciones: --info <archivo> (información extra de la empresa) · --idioma auto|es|en · --dry (arma los textos, no llama a la IA)
+//           --fundir (2 llamadas: la revisión anti-IA va dentro de la que escribe) · --etiqueta <texto> (sufijo de la carpeta de salida)
 // Si no se pasa --niveles, muestra los que detectó en el CV y se detiene: es la confirmación que después hará la pantalla.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { llamar } from '../src/ia.mjs';
-import { idiomasSchema, resultadoSchema, revisionSchema } from '../src/esquema/index.mjs';
+import { idiomasSchema, resultadoSchema, resultadoFundidoSchema, revisionSchema } from '../src/esquema/index.mjs';
 import { pasoIdiomas, pasoGeneracion, pasoRevision } from '../src/prompts.mjs';
 
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
@@ -37,7 +38,7 @@ if (String(args.cv).toLowerCase().endsWith('.pdf')) {
 
 const [oferta, cv, perfil] = await Promise.all([args.oferta, args.cv, args.perfil].map(r => readFile(r, 'utf8')));
 const infoEmpresa = args.info ? await readFile(args.info, 'utf8') : '';
-const slug = basename(args.oferta).replace(/\.\w+$/, '');
+const slug = basename(args.oferta).replace(/\.\w+$/, '') + (args.etiqueta ? '-' + args.etiqueta : '');
 const carpeta = join(RAIZ, 'datos-privados', 'salidas', slug);
 await mkdir(carpeta, { recursive: true });
 const guardar = (nombre, contenido) => writeFile(join(carpeta, nombre), typeof contenido === 'string' ? contenido : JSON.stringify(contenido, null, 2), 'utf8');
@@ -79,19 +80,23 @@ if (!niveles[idiomaSalida]) { console.error(`Falta el nivel de ${idiomaSalida} e
 console.log(`\nIdioma de salida: ${idiomaSalida} · niveles confirmados: ${JSON.stringify(niveles)}`);
 
 // ---------- Llamada 2: análisis, CV, carta y guía ----------
-const promptGeneracion = await pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSalida, niveles });
+const promptGeneracion = await pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSalida, niveles, fundir: !!args.fundir });
 if (args.dry) {
   const revisionDemo = await pasoRevision({ resultado: { cv: {}, carta: {}, preparacion_entrevista: [] }, cv, perfil, idiomaSalida, niveles });
   console.log(`\n[dry] Llamada 2: ${promptGeneracion.length.toLocaleString('es-AR')} caracteres · Llamada 3 (sin contenido generado): ${revisionDemo.length.toLocaleString('es-AR')} caracteres. No se llamó a la IA.`);
   process.exit(0);
 }
-const resultado = await correr('Llamada 2: análisis, CV, carta y guía', promptGeneracion, resultadoSchema);
+const resultado = await correr(args.fundir ? 'Llamada 2: análisis, CV, carta, guía y revisión' : 'Llamada 2: análisis, CV, carta y guía',
+  promptGeneracion, args.fundir ? resultadoFundidoSchema : resultadoSchema);
 await guardar('2-resultado.json', resultado);
 
-// ---------- Llamada 3: revisión anti-IA ----------
-const promptRevision = await pasoRevision({ resultado, cv, perfil, idiomaSalida, niveles });
-const revision = await correr('Llamada 3: revisión anti-IA', promptRevision, revisionSchema);
-await guardar('3-revision.json', revision);
+// ---------- Llamada 3: revisión anti-IA (solo si no se fundió) ----------
+let revision = resultado;
+if (!args.fundir) {
+  const promptRevision = await pasoRevision({ resultado, cv, perfil, idiomaSalida, niveles });
+  revision = await correr('Llamada 3: revisión anti-IA', promptRevision, revisionSchema);
+  await guardar('3-revision.json', revision);
+}
 
 // ---------- Informe legible ----------
 const lista = (items) => items.map(i => `- ${i}`).join('\n') || '- (nada)';
