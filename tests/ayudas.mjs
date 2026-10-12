@@ -87,3 +87,18 @@ export function leerEntradaZip(buffer, nombre) {
   }
   return null;
 }
+
+export const IDIOMAS = {
+  cv_idiomas: [{ idioma: 'Español', nivel_en_el_cv: 'Nativo', nivel_cefr: 'nativo', cita: 'Español: Nativo' }, { idioma: 'Inglés', nivel_en_el_cv: 'intermedio', nivel_cefr: 'no_figura', cita: 'Inglés: intermedio' }],
+  oferta: { idioma_detectado: 'es', idiomas_requeridos: [{ idioma: 'Inglés', nivel_pedido: 'avanzado', excluyente: true, cita: 'Inglés avanzado' }] },
+};
+
+// Simula la IA según el esquema que le piden; `espera` demora la respuesta y `error` simula una falla del servicio.
+export function iaPorEsquema({ espera = 0, error = null } = {}) {
+  return async ({ esquema }) => {
+    if (espera) await new Promise((r) => setTimeout(r, espera));
+    if (error) throw error;
+    const resultado = esquema.properties.cv_idiomas ? IDIOMAS : esquema.properties.analisis ? resultadoEjemplo() : revisionEjemplo();
+    return { resultado: structuredClone(resultado), costoEstimadoUsd: 0.1, duracionMs: 1 };
+  };
+}

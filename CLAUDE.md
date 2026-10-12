@@ -15,7 +15,8 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - Fase 0 (decisiones y plan): hecha.
 - Fase 1 (skills y tono): **hecha** (12/10/2026; el tono quedó confirmado en `tono.md`). Próxima: Fase 2. Adaptaciones hechas: 1 de 7 (`interview-system-designer`), 2 de 7 (`cold-email`, base de la carta), 3 de 7 (`content-humanizer`, revisión anti-IA) 4 de 7 (`marketing-context`, perfil de candidata) 5 de 7 (`verificador-restricciones-cliente`, auditor de pruebas), 6 de 7 (`copy-editing`, guía de viñetas del CV) y 7 de 7 (`revisor-textos-web`, se usa tal cual en las pruebas; ver `pruebas/revision-textos.md`). Tono confirmado: saludo "Hola, ¿qué tal?" ("Hello, how are you?" en inglés), firma "María Sol Alcaraz", humor sutil solo si sale natural. Hay un borrador de `datos-privados/perfil.md` pendiente de revisión de la usuaria. Todavía no hay código de la app.
 - Fase 2 (prompts sin interfaz): **hecha** (aprobada por la usuaria el 12/10/2026). Quedó pendiente una prueba con una oferta realmente en inglés (Fase 5, casos 2 y 4).
-- Fase 3 (lectura de archivos, conexión con la IA, validación y .docx): **en curso**. Hecho: lectura de PDF y Word (`src/lectura/`), validación con `ajv` y controles con código (`src/validacion/`), generador del .docx (`src/docx/`), flujo completo (`src/postular.mjs`) y 25 pruebas automáticas (`npm test`). Pendiente: aprobación de la usuaria. No pasar a la Fase 4 sin su OK.
+- Fase 3 (lectura de archivos, conexión con la IA, validación y .docx): **hecha** (aprobada por la usuaria el 12/10/2026): lectura de PDF y Word, validación con `ajv`, controles con código, generador del .docx y flujo completo con 26 pruebas automáticas.
+- Fase 4 (pantalla): **en curso**. Hecho: servidor local (`app/servidor.mjs`), pantalla única (`app/public/`), arranque con doble clic (`Abrir Postulaciones.cmd`), 11 pruebas del servidor y una prueba en Chrome real (`npm run pantalla`). Pendiente: aprobación de la usuaria. No pasar a la Fase 5 sin su OK.
 - Especificación completa: `prompt-2-herramienta-postulacion.md` (fases, flujo de pantalla, criterios de aceptación). Hay dos cambios sobre ella, listados en "Decisiones tomadas": el proveedor de IA y la guía de entrevista.
 
 ## Decisiones tomadas (no cambiar sin preguntar)
@@ -27,7 +28,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **Medición de llamadas (Exactian, 2026-10-12, costos estimados a precios de API, referencia de uso):** 3 llamadas ≈ 0,50 USD y 2,7 minutos (idiomas 0,01; análisis+CV+carta+guía 0,32; revisión 0,18); fundiendo la revisión en la llamada grande (2 llamadas) ≈ 0,40 USD y 2,6 minutos. Calidad parecida, pero con la revisión fundida `cambios[]` deja de reflejar correcciones reales. **Decisión (usuaria, 2026-10-12): 3 llamadas.**
 - **Llamadas por postulación (3):** 1) extraer idiomas y niveles del CV; 2) análisis + CV + carta + guía de entrevista; 3) revisión anti-IA. Se evalúa fundir la 1 o la 3 si gasta demasiado cupo.
 - **Corre solo en la PC de la usuaria (`localhost`).** Sin servidor publicado, por eso no hay login.
-- **Stack:** TypeScript + Next.js (pantalla y rutas del servidor en una sola app).
+- **Stack:** JavaScript de Node sin framework. **Cambió el 12/10/2026 respecto de la Fase 0 (que decía Next.js)** por decisión de la usuaria: la pantalla es un servidor local simple (como Rumbo a España) con HTML, CSS y JS puros. Menos dependencias y código fácil de auditar.
   - `ajv`: validar la respuesta por segunda vez contra el mismo JSON Schema (reemplaza a `zod`: los esquemas ya están en JSON Schema y con `zod` habría que escribirlos dos veces).
   - `unpdf`: leer PDF.
   - `mammoth`: leer .docx.
@@ -53,17 +54,17 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **Descartado:** el flujo donde la app da un prompt, se pega en un chat de IA y se vuelve a pegar la respuesta. También la API de Anthropic y el diseño para open source.
 
 ## Cómo correrlo
-Todavía no hay app. Cuando exista:
-1. Tener Claude Code instalado y con la sesión iniciada (`claude` en una terminal).
-2. `cp .env.example .env` (opcional: cambiar el modelo).
-3. `npm install`
-4. `npm run dev` y abrir `http://localhost:3000`.
+
+1. Tener Node, Claude Code (con la sesión iniciada: `claude` en una terminal) y `datos-privados/perfil.md`.
+2. `npm install` (una sola vez).
+3. Doble clic en `Abrir Postulaciones.cmd` (o `npm start`) y se abre `http://127.0.0.1:4400`. La ventana negra tiene que quedar abierta: si se cierra, la herramienta se apaga.
+4. Opcional: `cp .env.example .env` para cambiar el modelo.
 
 Hoy, sin pantalla (Fase 3): `node scripts/postular.mjs --oferta <archivo> --cv <pdf o docx> --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Nombre]` (`--dry` arma los textos sin llamar a la IA). Deja el .docx, la carta, la guía y el panel en `datos-privados/salidas/`. Pruebas automáticas: `npm test`.
 
 ## Estructura prevista
 - `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; `02-cv.md` es un borrador con las reglas de CV y la guía de viñetas). Las listas de palabras están en `prompts/listas/`.
-- `src/ia.mjs` (llama a Claude Code), `src/esquema/index.mjs` (formato de las respuestas, JSON Schema), `src/prompts.mjs` (arma cada llamada), `src/postular.mjs` (flujo completo: 3 llamadas, validación con un reintento, controles y .docx), `src/lectura/` (PDF, Word y datos de contacto del perfil), `src/validacion/` (esquema y controles con código), `src/docx/generar.mjs` (el .docx), `src/panel.mjs` (panel en texto), `scripts/postular.mjs` (corre todo desde la terminal) y `scripts/generar-cv.mjs` (convierte un CV en JSON a .docx). `app/` llega en la Fase 4.
+- `src/ia.mjs` (llama a Claude Code), `src/esquema/index.mjs` (formato de las respuestas, JSON Schema), `src/prompts.mjs` (arma cada llamada), `src/postular.mjs` (flujo completo: 3 llamadas, validación con un reintento, controles y .docx), `src/lectura/` (PDF, Word y datos de contacto del perfil), `src/validacion/` (esquema y controles con código), `src/docx/generar.mjs` (el .docx), `src/panel.mjs` (panel en texto), `scripts/postular.mjs` (corre todo desde la terminal) y `scripts/generar-cv.mjs` (convierte un CV en JSON a .docx). `app/servidor.mjs` (servidor local: solo escucha en 127.0.0.1, exige una cabecera propia en los POST y revisa el Host; el trabajo en curso vive solo en memoria y se borra a los 30 minutos), `app/public/` (la pantalla: se muestra todo como texto, nunca como HTML) y `tests/e2e/pantalla.mjs` (prueba en un Chrome real).
 - `plantillas/`: plantilla vacía del perfil (sin datos personales).
 - `pruebas/verificador.md`: las 15 restricciones para auditar los resultados (Fase 5). La verificación con IA **no corre dentro de la app** (gastaría una llamada más del plan); lo automático lo cubren los controles con código de la Fase 3.
 - `datos-privados/`: CVs, ofertas de prueba y `perfil.md`. **Ignorada por git.**

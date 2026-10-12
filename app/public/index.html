@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Postulaciones</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+  <header class="encabezado">
+    <h1>Postulaciones</h1>
+    <p>Subí tu CV y pegá la oferta. Te devuelvo un CV a medida, una carta corta y una guía para la entrevista.</p>
+  </header>
+
+  <main>
+    <div id="estado" class="aviso" hidden></div>
+    <div id="error" class="aviso aviso-error" role="alert" hidden></div>
+
+    <!-- Paso 1: datos -->
+    <section id="paso-datos" aria-labelledby="t-datos">
+      <h2 id="t-datos">1. Tus datos y la oferta</h2>
+      <form id="formulario" novalidate>
+        <div class="campo">
+          <label for="cv">Tu CV completo <span class="ayuda">(PDF o Word, hasta 8 MB)</span></label>
+          <input id="cv" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+          <p id="cv-nombre" class="ayuda"></p>
+        </div>
+
+        <div class="campo">
+          <label for="oferta">Texto de la oferta</label>
+          <textarea id="oferta" rows="10" placeholder="Pegá acá la oferta completa."></textarea>
+        </div>
+
+        <details class="campo">
+          <summary>Información extra de la empresa (opcional)</summary>
+          <textarea id="info" rows="4" aria-label="Información extra de la empresa" placeholder="Por ejemplo, algo de su web o de la publicación que no esté en la oferta."></textarea>
+        </details>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="idioma">Idioma del CV y la carta</label>
+            <select id="idioma">
+              <option value="auto">Automático (el de la oferta)</option>
+              <option value="es">Español</option>
+              <option value="en">Inglés</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="empresa">Empresa <span class="ayuda">(para el nombre del archivo, opcional)</span></label>
+            <input id="empresa" type="text" maxlength="60" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="campo">
+          <label class="casilla"><input id="usar-celular" type="checkbox"> Incluir mi celular en el CV</label>
+          <input id="celular" type="tel" maxlength="40" autocomplete="off" placeholder="Por ejemplo, 11 1234 5678" aria-label="Número de celular" disabled>
+        </div>
+
+        <button id="continuar" class="boton" type="submit">Continuar</button>
+      </form>
+      <p class="privacidad">No se guarda nada: tu CV y la oferta se procesan y se descartan. Para escribir los textos se envían a Claude, con la sesión de tu cuenta.</p>
+    </section>
+
+    <!-- Paso 2: niveles de idioma -->
+    <section id="paso-niveles" aria-labelledby="t-niveles" hidden>
+      <h2 id="t-niveles">2. Confirmá tus niveles de idioma</h2>
+      <p>El texto se escribe a tu nivel real, nunca más alto. Estos son los niveles que encontré en tu CV: corregilos si hace falta.</p>
+      <div id="pide-oferta" class="aviso" hidden></div>
+      <table class="niveles">
+        <thead><tr><th scope="col">Idioma</th><th scope="col">Lo que dice tu CV</th><th scope="col">Tu nivel</th></tr></thead>
+        <tbody id="filas-niveles"></tbody>
+      </table>
+      <p id="falta-nivel" class="nota aviso-nivel" role="status"></p>
+      <div class="campo">
+        <label for="idioma-salida">El CV y la carta se escriben en</label>
+        <select id="idioma-salida"></select>
+      </div>
+      <div class="acciones">
+        <button id="volver" class="boton boton-secundario" type="button">Volver</button>
+        <button id="generar" class="boton" type="button">Generar</button>
+      </div>
+    </section>
+
+    <!-- Paso 3: progreso -->
+    <section id="paso-progreso" aria-labelledby="t-progreso" hidden>
+      <h2 id="t-progreso">3. Armando tu postulación</h2>
+      <p id="progreso-mensaje" role="status" aria-live="polite">Empezando…</p>
+      <p class="ayuda">Tarda unos 3 minutos. No cierres esta pestaña ni la ventana negra.</p>
+      <p id="progreso-tiempo" class="ayuda"></p>
+    </section>
+
+    <!-- Paso 4: resultado -->
+    <section id="paso-resultado" aria-labelledby="t-resultado" hidden>
+      <h2 id="t-resultado">4. Tu postulación</h2>
+      <div id="resultado"></div>
+      <button id="nueva" class="boton boton-secundario" type="button">Nueva postulación</button>
+    </section>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
