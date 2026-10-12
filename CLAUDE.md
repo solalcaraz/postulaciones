@@ -35,6 +35,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **Fuente de verdad del contenido:** el CV subido + `datos-privados/perfil.md` (local, ignorado por git). La app solo lee el perfil, nunca lo escribe. Si perfil y CV se contradicen, se avisa en el panel; no se elige uno en silencio.
 - **PDF escaneado (sin texto):** error claro pidiendo un PDF con texto o un .docx.
 - **Revisión anti-IA:** solo corta, reemplaza por hechos del CV, ordena y varía el ritmo; nunca agrega contenido. Devuelve `cambios[]` (se muestran en el panel) y `sin_arreglar[]`. Guiones largos: ninguno en el CV, uno como máximo en la carta, ninguno en las preguntas de la guía.
+- **Controles con código (se hacen en la Fase 3, sin IA y sin gastar cupo):** 1) lista negra de frases: si después de la revisión sigue apareciendo alguna muletilla prohibida, se pide un reintento sobre esa parte; 2) control de hechos: los números, años y nombres propios del texto final deben estar en el CV original o el perfil; si aparece uno nuevo, se avisa en el panel. No reemplazan las reglas del prompt: son un cinturón de seguridad.
 - **Carta:** cierre que sugiere una charla de forma cortés, sin pedirla, sin urgencia y sin "contratame" (ver `prompts/03-carta.md`).
 - **Descartado:** el flujo donde la app da un prompt, se pega en un chat de IA y se vuelve a pegar la respuesta. También la API de Anthropic y el diseño para open source.
 
