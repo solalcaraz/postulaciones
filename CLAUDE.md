@@ -31,6 +31,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
   - `unpdf`: leer PDF.
   - `mammoth`: leer .docx.
   - `docx`: generar el .docx.
+- **Pendiente para la Fase 3 (detectado en las pruebas):** los títulos de sección del .docx se localizan por código según el idioma (Experience, Projects, Education, Skills, Languages); en el CV en inglés el nombre de la Tecnicatura va como en el CV en inglés de la usuaria.
 - **Entrada:** CV en PDF o .docx + oferta en texto pegado. **Salida:** .docx editable + carta copiable + panel de análisis + guía de entrevista copiable (agregada el 12/10/2026 sobre la especificación original). La IA devuelve, en este orden: `analisis`, `cv`, `carta`, `preparacion_entrevista`.
 - **Panel de análisis:** siempre en español, aunque la oferta y el CV generado estén en inglés. Puntaje de 0 a 3 por requisito, con cita textual del CV.
 - **Guía de entrevista:** las preguntas van en el idioma de la oferta (sin traducción); las notas, en español.

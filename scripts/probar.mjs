@@ -82,7 +82,7 @@ console.log(`\nIdioma de salida: ${idiomaSalida} · niveles confirmados: ${JSON.
 // ---------- Llamada 2: análisis, CV, carta y guía ----------
 const promptGeneracion = await pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSalida, niveles, fundir: !!args.fundir });
 if (args.dry) {
-  const revisionDemo = await pasoRevision({ resultado: { cv: {}, carta: {}, preparacion_entrevista: [] }, cv, perfil, idiomaSalida, niveles });
+  const revisionDemo = await pasoRevision({ resultado: { cv: {}, carta: {}, preparacion_entrevista: [] }, cv, perfil, oferta, infoEmpresa, idiomaSalida, niveles });
   console.log(`\n[dry] Llamada 2: ${promptGeneracion.length.toLocaleString('es-AR')} caracteres · Llamada 3 (sin contenido generado): ${revisionDemo.length.toLocaleString('es-AR')} caracteres. No se llamó a la IA.`);
   process.exit(0);
 }
@@ -93,7 +93,7 @@ await guardar('2-resultado.json', resultado);
 // ---------- Llamada 3: revisión anti-IA (solo si no se fundió) ----------
 let revision = resultado;
 if (!args.fundir) {
-  const promptRevision = await pasoRevision({ resultado, cv, perfil, idiomaSalida, niveles });
+  const promptRevision = await pasoRevision({ resultado, cv, perfil, oferta, infoEmpresa, idiomaSalida, niveles });
   revision = await correr('Llamada 3: revisión anti-IA', promptRevision, revisionSchema);
   await guardar('3-revision.json', revision);
 }

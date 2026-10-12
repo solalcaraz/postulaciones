@@ -51,7 +51,7 @@ export async function pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSa
   ].join('\n\n');
 }
 
-export async function pasoRevision({ resultado, cv, perfil, idiomaSalida, niveles }) {
+export async function pasoRevision({ resultado, cv, perfil, oferta, infoEmpresa, idiomaSalida, niveles }) {
   const instrucciones = (await Promise.all(['00-comun', '04-revision-anti-ia'].map(n => leer(`prompts/${n}.md`)))).join('\n\n---\n\n');
   const listaIdioma = await leer(idiomaSalida === 'en' ? 'prompts/listas/muletillas-en.md' : 'prompts/listas/muletillas-es.md');
   const simples = await leer('prompts/listas/palabras-simples.md');
@@ -68,6 +68,8 @@ export async function pasoRevision({ resultado, cv, perfil, idiomaSalida, nivele
     bloque('guia', JSON.stringify(guia, null, 2)),
     bloque('cv_original', cv),
     bloque('perfil', perfil),
+    bloque('oferta', oferta),
+    bloque('info_empresa', infoEmpresa || 'No hay información extra de la empresa.'),
     cierre,
   ].join('\n\n');
 }

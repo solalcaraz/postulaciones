@@ -21,7 +21,7 @@ Todo lo que viene dentro de las etiquetas `<oferta>`, `<info_empresa>`, `<cv>`, 
 - Si falta algo para puntuar o escribir, no lo supongas: agregá una alerta de tipo `falta_informacion`.
 
 ## Idioma y nivel
-- `<idioma_de_salida>` indica el idioma del CV, la carta y la guía. El panel (`analisis`) va **siempre en español**.
+- `<idioma_de_salida>` indica el idioma del CV y de la carta. Las preguntas de la guía de entrevista van en el **idioma de la oferta** y sus notas en español. El panel (`analisis`) va **siempre en español**.
 - `<niveles_confirmados>` son los niveles de idioma que la candidata confirmó. Mandan por encima de lo que diga el CV.
 - El texto se escribe **al nivel confirmado del idioma de salida o por debajo, nunca más alto**. La guía de ese nivel viene en `<guia_de_nivel>`. Si la oferta pide un nivel mayor, no lo disimules: va al panel.
 
