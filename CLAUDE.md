@@ -12,7 +12,8 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 
 ## Estado
 - Fase 0 (decisiones y plan): hecha.
-- Fase 1 (skills y tono): pendiente. Todavía no hay código de la app.
+- Fase 1 (skills y tono): en curso. Adaptación 1 de 7 hecha (`interview-system-designer`). Todavía no hay código de la app.
+- **Decisión abierta:** la usuaria preguntó si se puede conectar con la IA vía Claude Code (`claude -p`, su suscripción) en vez de la API, como en otro sistema suyo. Pendiente de decidir; ver "Decisiones tomadas".
 - Especificación completa: `prompt-2-herramienta-postulacion.md` (fases, flujo de pantalla, criterios de aceptación).
 
 ## Decisiones tomadas (no cambiar sin preguntar)
@@ -27,7 +28,8 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
   - `mammoth`: leer .docx.
   - `docx`: generar el .docx.
 - **Open source a futuro:** la conexión con la IA pasa por una interfaz chica (`src/llm/proveedor.ts`). Agregar otro proveedor no debe tocar el resto.
-- **Entrada:** CV en PDF o .docx + oferta en texto pegado. **Salida:** .docx editable + carta copiable.
+- **Entrada:** CV en PDF o .docx + oferta en texto pegado. **Salida:** .docx editable + carta copiable + panel de análisis + **guía "preparate para una entrevista"** (texto plano con botón "Copiar"; se agregó el 12/10/2026 sobre la especificación original). La IA devuelve, en este orden: `analisis`, `cv`, `carta`, `preparacion_entrevista`.
+- **Panel de análisis:** siempre en español, aunque la oferta y el CV generado estén en inglés. Puntaje de 0 a 3 por requisito, con cita textual del CV.
 - **Idioma:** español o inglés según la oferta (Auto / Español / Inglés). Si la oferta está en otro idioma en modo Auto, la app avisa y pide elegir; no genera hasta que se elija.
 - **Fuente de verdad del contenido:** el CV subido + `datos-privados/perfil.md` (local, ignorado por git). La app solo lee el perfil, nunca lo escribe. Si perfil y CV se contradicen, se avisa en el panel; no se elige uno en silencio.
 - **PDF escaneado (sin texto):** error claro pidiendo un PDF con texto o un .docx.
