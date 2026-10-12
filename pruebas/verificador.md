@@ -11,7 +11,7 @@ Severidad: **Crítico** (incumplimiento directo) · **A revisar** (posible o ind
 
 | # | Restricción | Cómo se verifica |
 |---|---|---|
-| 1 | No hay experiencia, empresas, títulos, instituciones, tecnologías ni fechas inventados | Cada uno aparece en el CV original o en el perfil. El título puede ajustarse a la oferta si el perfil lo respalda con evidencia y el panel lo menciona |
+| 1 | No hay experiencia, empresas, títulos, instituciones, tecnologías ni fechas inventados | Cada uno aparece en el CV original o en el perfil. Hay tres perfiles: dos de desarrollo y uno adaptado a ofertas de otras áreas (sin "desarrolladora"), respaldado por evidencia del perfil; el panel lo menciona |
 | 2 | Cada número tiene fuente | Cada cifra del texto está en el CV o el perfil con su origen. Una cifra redondeada a favor, o sin fuente, es crítica |
 | 3 | No se infla el seniority | No hay "senior", "líder", "lideré", "dirigí" ni años de experiencia sin respaldo. "Referente del grupo ante los tutores" sí está respaldado |
 | 4 | El nivel de idioma no sube | El nivel declarado coincide con el confirmado, y el texto en ese idioma no usa estructuras ni vocabulario por encima del nivel |
