@@ -13,7 +13,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 
 ## Estado
 - Fase 0 (decisiones y plan): hecha.
-- Fase 1 (skills y tono): en curso. Adaptaciones hechas: 1 de 7 (`interview-system-designer`), 2 de 7 (`cold-email`, base de la carta) y 3 de 7 (`content-humanizer`, revisión anti-IA). Todavía no hay código de la app.
+- Fase 1 (skills y tono): en curso. Adaptaciones hechas: 1 de 7 (`interview-system-designer`), 2 de 7 (`cold-email`, base de la carta), 3 de 7 (`content-humanizer`, revisión anti-IA) y 4 de 7 (`marketing-context`, perfil de candidata). Hay un borrador de `datos-privados/perfil.md` pendiente de revisión de la usuaria. Todavía no hay código de la app.
 - Especificación completa: `prompt-2-herramienta-postulacion.md` (fases, flujo de pantalla, criterios de aceptación). Hay dos cambios sobre ella, listados en "Decisiones tomadas": el proveedor de IA y la guía de entrevista.
 
 ## Decisiones tomadas (no cambiar sin preguntar)
@@ -32,7 +32,8 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **Panel de análisis:** siempre en español, aunque la oferta y el CV generado estén en inglés. Puntaje de 0 a 3 por requisito, con cita textual del CV.
 - **Guía de entrevista:** las preguntas van en el idioma de la oferta (sin traducción); las notas, en español.
 - **Idioma:** español o inglés según la oferta (Auto / Español / Inglés). Si la oferta está en otro idioma en modo Auto, la app avisa y pide elegir; no genera hasta que se elija.
-- **Fuente de verdad del contenido:** el CV subido + `datos-privados/perfil.md` (local, ignorado por git). La app solo lee el perfil, nunca lo escribe. Si perfil y CV se contradicen, se avisa en el panel; no se elige uno en silencio.
+- **Fuente de verdad del contenido:** el CV subido + `datos-privados/perfil.md` (local, ignorado por git; plantilla vacía en `plantillas/perfil.plantilla.md`). El perfil tiene, por proyecto, Antes / Cambio / Después / Números con su fuente, y separa "Mi parte" de lo que hizo el equipo. Lo marcado `[a confirmar]` no se usa. La app solo lee el perfil, nunca lo escribe. Si perfil y CV se contradicen, se avisa en el panel; no se elige uno en silencio.
+- **Contacto y celular:** el CV lleva ciudad y provincia, email, LinkedIn, GitHub y portfolio. El **celular es opcional**: la pantalla tiene una casilla "Incluir celular" con un campo para escribirlo (Fase 4). El programa lo inserta en el encabezado del .docx; no se le manda a la IA ni se guarda en el perfil. Sin foto ni dirección completa.
 - **PDF escaneado (sin texto):** error claro pidiendo un PDF con texto o un .docx.
 - **Revisión anti-IA:** solo corta, reemplaza por hechos del CV, ordena y varía el ritmo; nunca agrega contenido. Devuelve `cambios[]` (se muestran en el panel) y `sin_arreglar[]`. Guiones largos: ninguno en el CV, uno como máximo en la carta, ninguno en las preguntas de la guía.
 - **Controles con código (se hacen en la Fase 3, sin IA y sin gastar cupo):** 1) lista negra de frases: si después de la revisión sigue apareciendo alguna muletilla prohibida, se pide un reintento sobre esa parte; 2) control de hechos: los números, años y nombres propios del texto final deben estar en el CV original o el perfil; si aparece uno nuevo, se avisa en el panel. No reemplazan las reglas del prompt: son un cinturón de seguridad.
@@ -49,7 +50,8 @@ Todavía no hay app. Cuando exista:
 ## Estructura prevista
 - `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; `02-cv.md` es un borrador con las reglas de CV de la usuaria).
 - `src/llm/`, `src/lectura/`, `src/docx/`, `src/esquema/`, `app/`.
-- `datos-privados/`: CV de prueba, ofertas y `perfil.md`. **Ignorada por git.**
+- `plantillas/`: plantilla vacía del perfil (sin datos personales).
+- `datos-privados/`: CVs, ofertas de prueba y `perfil.md`. **Ignorada por git.**
 
 ## Reglas permanentes
 - No guardar el CV ni las ofertas en ningún lado: se procesan en memoria y se descartan. Sin base de datos, sin archivos guardados, sin logs con su contenido.
