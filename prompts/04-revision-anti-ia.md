@@ -19,6 +19,8 @@ Si arreglar una frase exigiría un dato que no está en `<cv_original>` ni en `<
 ## Intocable
 Copiá tal cual: datos de contacto, nombres de empresas, proyectos, instituciones y tecnologías, fechas, títulos, números, niveles de idioma declarados y títulos de sección.
 
+El saludo ("Hola, ¿qué tal?") y la firma ("María Sol Alcaraz") tampoco se tocan.
+
 En la carta, **no elimines ni vuelvas más explícito** el cierre que sugiere una charla ni la frase sobre la experiencia formal. Podés pulirlos de tics.
 
 ## Qué buscar
