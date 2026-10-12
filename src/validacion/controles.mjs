@@ -41,7 +41,8 @@ const enlaces = (t) => (String(t).toLowerCase().match(/(?:https?:\/\/)?[a-z0-9-]
 const terminos = (t) => (String(t).match(/\b(?:[A-Z][a-z]+[A-Z][A-Za-z0-9]*|[A-Z]{2,}[a-z]?[A-Za-z0-9]*)\b/g) ?? []);
 
 // `fuentes` son los textos de los que sale todo lo que se puede afirmar: CV, perfil, oferta e información de la empresa.
-export function datosNuevos(textos, fuentes, { contacto = {} } = {}) {
+// Los términos técnicos se revisan solo en el CV y la carta: la guía de entrevista puede nombrar ejemplos (SELECT, UPDATE) como consejo.
+export function datosNuevos(textos, fuentes, { contacto = {}, sinTerminosEn = ['guia'] } = {}) {
   const corpus = [...fuentes, ...Object.values(contacto)].join('\n');
   const nums = new Set(numeros(corpus));
   const links = enlaces(corpus);
@@ -52,6 +53,7 @@ export function datosNuevos(textos, fuentes, { contacto = {} } = {}) {
     for (const e of new Set(enlaces(texto))) {
       if (!links.some((l) => l === e || l.startsWith(e) || e.startsWith(l))) avisos.push({ tipo: 'enlace', valor: e, donde: ruta });
     }
+    if (sinTerminosEn.some((p) => ruta.startsWith(p))) continue;
     for (const t of new Set(terminos(texto))) if (!minusculas.includes(t.toLowerCase())) avisos.push({ tipo: 'término', valor: t, donde: ruta });
   }
   return avisos;

@@ -46,3 +46,10 @@ test('los números con formato distinto se reconocen como el mismo dato', () => 
   const fuentes = ['173.242 transacciones y un 9,2 % de aciertos'];
   assert.deepEqual(datosNuevos([{ ruta: 'x', texto: '173242 transacciones y 9.2% de aciertos' }], fuentes), []);
 });
+
+test('los términos técnicos de la guía de entrevista no se marcan, pero sus números sí', () => {
+  const fuentes = ['Armé la tienda con Kotlin y PostgreSQL.'];
+  const guia = [{ ruta: 'guia[0].si_no_lo_hiciste', texto: 'Preparate para consultas SELECT y UPDATE. Dijiste que fueron 99 casos.' }];
+  const tipos = datosNuevos(guia, fuentes).map((d) => d.tipo);
+  assert.deepEqual(tipos, ['número']);
+});
