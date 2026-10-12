@@ -63,7 +63,7 @@ export function llamar({ prompt, esquema, limiteMs = 8 * 60 * 1000 }) {
       let resultado = r.structured_output;
       if (resultado === undefined) {
         try { resultado = JSON.parse(String(r.result).replace(/^```(?:json)?\s*|\s*```$/g, '')); } catch {
-          rechazar(new ErrorIA('La respuesta de Claude no vino en el formato esperado.'));
+          rechazar(new ErrorIA('La respuesta de Claude no vino en el formato esperado.', 'formato'));
           return;
         }
       }

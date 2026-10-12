@@ -1,0 +1,17 @@
+{
+  "name": "postulaciones",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Herramienta personal: CV y carta a medida de una oferta de trabajo.",
+  "scripts": {
+    "postular": "node scripts/postular.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "docx": "^9.10.0",
+    "mammoth": "^1.13.0",
+    "unpdf": "^1.8.1"
+  }
+}

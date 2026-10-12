@@ -1,0 +1,20 @@
+{
+  "_nota": "Fragmentos de frases prohibidas (de la especificación y de tono.md). La app los busca con código en el texto final, sin gastar cupo. Cada uno se compara al comienzo de una palabra, sin distinguir mayúsculas.",
+  "es": [
+    "apasionad", "me apasiona", "dinámic", "proactiv", "comprometida y",
+    "entusiasmad", "me dirijo a ustedes", "por la presente", "estimados",
+    "sólida trayectoria", "amplia trayectoria", "orientada a resultados", "orientada a objetivos",
+    "cabe destacar", "cabe mencionar", "cabe señalar", "es importante mencionar", "es importante notar", "vale la pena señalar",
+    "resulta fundamental", "resulta crucial", "en un mundo cada vez más", "no cabe duda",
+    "en definitiva", "sinergia", "empoderar", "potenciar",
+    "quedo a la espera", "pronta respuesta", "gracias de antemano", "no duden en contactarme",
+    "me encantaría tener la oportunidad", "contratame", "persona ideal", "espero que este mensaje"
+  ],
+  "en": [
+    "passionate", "leverag", "spearhead", "proven track record", "dynamic", "thrilled",
+    "excited to apply", "excited about the opportunity", "results-driven", "result-oriented", "team player",
+    "fast learner", "self-starter", "hit the ground running", "go-getter", "think outside the box",
+    "i am writing to express", "great fit", "look forward to hearing", "thank you for your time",
+    "i would welcome the opportunity", "seamless", "cutting-edge", "synergy", "delve", "i hope this letter finds you well"
+  ]
+}

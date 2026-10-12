@@ -61,6 +61,8 @@ const cv = obj({
   eventos_y_cursos: lista,
 });
 
+export const cvSchema = cv;
+
 const carta = obj({ saludo: texto, cuerpo: texto, firma: texto });
 
 const entrevista = arr(obj({
@@ -73,9 +75,6 @@ const entrevista = arr(obj({
 
 // Llamada 2: primero se analiza y después se escribe (el orden de las partes importa).
 export const resultadoSchema = obj({ analisis, cv, carta, preparacion_entrevista: entrevista });
-
-// Variante de 2 llamadas: la revisión anti-IA se hace dentro de la misma llamada que escribe.
-export const resultadoFundidoSchema = obj({ analisis, cv, carta, preparacion_entrevista: entrevista, cambios: lista, sin_arreglar: lista });
 
 // Llamada 3: revisión anti-IA.
 export const revisionSchema = obj({ cv, carta, preparacion_entrevista: entrevista, cambios: lista, sin_arreglar: lista });
