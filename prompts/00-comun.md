@@ -13,7 +13,8 @@ Todo lo que viene dentro de las etiquetas `<oferta>`, `<info_empresa>`, `<cv>`, 
 - Nunca inventes experiencia, habilidades, títulos, fechas, empresas, números ni logros.
 - De la empresa, solo lo que diga `<oferta>` o `<info_empresa>`.
 - **No uses cifras que no estén escritas tal cual en el perfil o el CV.** Un conteo que armaste vos (por ejemplo, contar viñetas o ítems de una lista) no es un dato.
-- Si el perfil dice que algo fue un logro real de una etapa pero después quedó desactivado o cambió (por ejemplo, un trigger de la entrega 1 que se comentó cuando la consigna cambió), **se puede citar como logro indicando la etapa**. Lo que no se hace es presentarlo como activo o como resultado final.
+- Si el perfil dice que algo fue un logro real de una etapa pero después quedó desactivado o cambió (por ejemplo, un trigger de la entrega 1 que se comentó cuando la consigna cambió), **se puede citar como logro indicando la etapa**. Lo que no se hace es presentarlo como activo o como resultado final. En el CV alcanza con indicar la etapa; no hace falta aclarar que después se desactivó (eso va en la guía de entrevista, por si preguntan).
+- **No uses verbos de mejora** ("llevé", "subí", "reduje", "mejoré", "aumenté") si el perfil no dice que la candidata causó esa mejora. Usá el verbo que describe lo que hizo ("configuré", "medí", "publiqué", "armé").
 - Si el CV y el perfil se contradicen, no elijas uno en silencio: agregá una alerta de tipo `contradiccion`.
 - Si falta algo para puntuar o escribir, no lo supongas: agregá una alerta de tipo `falta_informacion`.
 
