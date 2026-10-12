@@ -47,7 +47,7 @@ Todavía no hay app. Cuando exista:
 4. `npm run dev` y abrir `http://localhost:3000`.
 
 ## Estructura prevista
-- `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; falta `02-cv`).
+- `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; `02-cv.md` es un borrador con las reglas de CV de la usuaria).
 - `src/llm/`, `src/lectura/`, `src/docx/`, `src/esquema/`, `app/`.
 - `datos-privados/`: CV de prueba, ofertas y `perfil.md`. **Ignorada por git.**
 
