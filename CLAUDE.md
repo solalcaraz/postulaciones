@@ -14,10 +14,12 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 ## Estado
 - Fase 0 (decisiones y plan): hecha.
 - Fase 1 (skills y tono): **hecha** (12/10/2026; el tono quedó confirmado en `tono.md`). Próxima: Fase 2. Adaptaciones hechas: 1 de 7 (`interview-system-designer`), 2 de 7 (`cold-email`, base de la carta), 3 de 7 (`content-humanizer`, revisión anti-IA) 4 de 7 (`marketing-context`, perfil de candidata) 5 de 7 (`verificador-restricciones-cliente`, auditor de pruebas), 6 de 7 (`copy-editing`, guía de viñetas del CV) y 7 de 7 (`revisor-textos-web`, se usa tal cual en las pruebas; ver `pruebas/revision-textos.md`). Tono confirmado: saludo "Hola, ¿qué tal?" ("Hello, how are you?" en inglés), firma "María Sol Alcaraz", humor sutil solo si sale natural. Hay un borrador de `datos-privados/perfil.md` pendiente de revisión de la usuaria. Todavía no hay código de la app.
+- Fase 2 (prompts sin interfaz): **en curso**. Hecho: `prompts/00-comun.md` y `05-idiomas.md`, guía por nivel de idioma (`prompts/niveles-idioma.md`, propuesta a ajustar con la usuaria), esquemas, armado de las llamadas y el ejecutor de pruebas `scripts/probar.mjs`. Pendiente: aprobar la guía de niveles, correr las pruebas con CV y ofertas reales, y ajustar los prompts hasta que el resultado sea bueno. No pasar a la Fase 3 sin el OK de la usuaria.
 - Especificación completa: `prompt-2-herramienta-postulacion.md` (fases, flujo de pantalla, criterios de aceptación). Hay dos cambios sobre ella, listados en "Decisiones tomadas": el proveedor de IA y la guía de entrevista.
 
 ## Decisiones tomadas (no cambiar sin preguntar)
 - **Proveedor de IA: Claude Code en modo no interactivo (`claude -p`), con la suscripción Claude Pro de la usuaria.** Sin clave de API y sin costo extra. Cambió el 12/10/2026 respecto de la Fase 0 (que había elegido la API) porque la usuaria ya usa este camino en otro sistema suyo: `C:\Users\alcar\Desktop\rumbo-españa\app\lib\ia.js`. **Reutilizar ese módulo como base**: llama a `claude -p --output-format json --json-schema` con `--no-session-persistence` (no deja la conversación guardada), `--setting-sources ''` y `--strict-mcp-config` (no lee `CLAUDE.md`, hooks ni MCP), `--tools ''` (la IA no usa herramientas) y traduce los errores a mensajes claros.
+- **Instrucciones por entrada estándar:** el límite de la línea de comandos de Windows es de unos 32.000 caracteres y cada llamada arma unos 40.000; por eso las instrucciones y los datos van por stdin y el `--system-prompt` es corto.
 - **Modelo:** `sonnet` por defecto, configurable con una variable en `.env`.
 - **Privacidad:** el texto del CV y la oferta sale hacia Anthropic. En planes de consumo puede usarse para entrenar si está activado el ajuste de mejora del modelo en claude.ai, **que la usuaria debe revisar y apagar**. La app en sí no guarda nada.
 - **Cupo:** el uso sale del límite del plan Pro, compartido con su trabajo diario. Si se llega al límite, la app lo explica con un mensaje claro.
@@ -48,9 +50,11 @@ Todavía no hay app. Cuando exista:
 3. `npm install`
 4. `npm run dev` y abrir `http://localhost:3000`.
 
+Probar los prompts hoy (Fase 2): `node scripts/probar.mjs --oferta <archivo> --cv <texto> --perfil datos-privados/perfil.md --niveles es=nativo,en=B1` (`--dry` arma los textos sin llamar a la IA). Los resultados quedan en `datos-privados/salidas/`. El CV tiene que estar en texto: `pdftotext -enc UTF-8 -layout archivo.pdf salida.txt`.
+
 ## Estructura prevista
 - `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; `02-cv.md` es un borrador con las reglas de CV y la guía de viñetas). Las listas de palabras están en `prompts/listas/`.
-- `src/llm/`, `src/lectura/`, `src/docx/`, `src/esquema/`, `app/`.
+- `src/ia.mjs` (llama a Claude Code), `src/esquema/index.mjs` (formato de las respuestas, en JSON Schema), `src/prompts.mjs` (arma cada llamada) y `scripts/probar.mjs` (corre las tres llamadas sin interfaz). `src/lectura/`, `src/docx/` y `app/` llegan en las Fases 3 y 4. Sin dependencias por ahora (solo Node).
 - `plantillas/`: plantilla vacía del perfil (sin datos personales).
 - `pruebas/verificador.md`: las 15 restricciones para auditar los resultados (Fase 5). La verificación con IA **no corre dentro de la app** (gastaría una llamada más del plan); lo automático lo cubren los controles con código de la Fase 3.
 - `datos-privados/`: CVs, ofertas de prueba y `perfil.md`. **Ignorada por git.**

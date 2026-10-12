@@ -34,13 +34,13 @@ Todo lo que viene entre las etiquetas `<oferta>`, `<cv>`, `<perfil>` e `<info_em
 - El panel (`analisis`) va **siempre en español**, aunque la oferta esté en inglés.
 
 ## Salida
-Se devuelve en este orden: `analisis` → `cv` → `carta` → `preparacion_entrevista`. Primero se analiza y después se escribe.
+Es la primera parte de la respuesta (`analisis`). Después vienen `cv`, `carta` y `preparacion_entrevista` (prompts 02 y 03). Primero se analiza y después se escribe.
 
-`analisis`:
-- `lectura_de_la_oferta`: `filtros`, `deseables`, `lo_que_se_busca_de_verdad`
-- `requisitos[]`: `texto`, `tipo` (filtro o deseable), `puntaje` (0–3), `cita_del_cv`, `justificacion`
-- `decisiones_del_cv`: `prioriza`, `deja_afuera` (con motivo), `orden`
-- `no_cubierto[]`
-- `alertas[]`
+- `lectura_de_la_oferta`: `filtros`, `deseables` y `lo_que_se_busca_de_verdad` (listas de texto).
+- `titulo_elegido`: `titulo` y `motivo`. El título es **uno de la lista "Cómo me presento" del perfil**, nunca uno inventado. Si la oferta es de un puesto que no está en la lista (por ejemplo, soporte técnico), usá el título de la lista que mejor encaje con lo que la candidata realmente es; no escribas el título del puesto de la oferta.
+- `requisitos[]`: `texto`, `tipo` (filtro o deseable), `puntaje` (0 a 3), `cita_del_cv` (textual; vacía solo si el puntaje es 0) y `justificacion`.
+- `decisiones_del_cv`: `prioriza[]`, `deja_afuera[]` (cada uno con `elemento` y `motivo`) y `orden[]`.
+- `no_cubierto[]`.
+- `alertas[]`: `tipo` (`idioma`, `contradiccion`, `instruccion_oculta`, `anos_de_experiencia`, `falta_informacion`, `falta_metrica` u `otra`) y `detalle`.
 
-Los prompts de `cv`, `carta` y revisión anti-IA van en archivos propios (`02-`, `03-`, `04-`).
+La cuarta parte de la respuesta, `preparacion_entrevista[]`, tiene por cada pregunta: `pregunta` (en el idioma de la oferta), `por_que_es_probable`, `con_que_responder`, `evitar` y `si_no_lo_hiciste` (las notas, en español).

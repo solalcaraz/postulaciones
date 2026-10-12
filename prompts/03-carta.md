@@ -41,5 +41,5 @@ Un toque de humor sutil solo si sale natural y suma o destaca algo en la carta. 
 - Listas de tres por costumbre, "no solo X sino también Y", frases tipo eslogan, adjetivos sin respaldo, muchos guiones largos, oraciones todas del mismo largo.
 - Variá el largo de las oraciones. Que se note una voz.
 
-## Salida
-Solo el texto de la carta, sin comentarios.
+## Salida (parte `carta`)
+Tres campos: `saludo`, `cuerpo` (es lo que se cuenta para las 150 a 220 palabras) y `firma`. Sin comentarios.

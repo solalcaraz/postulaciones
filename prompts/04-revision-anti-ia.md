@@ -45,6 +45,6 @@ Usá la lista del idioma de cada texto.
 5. ¿Un párrafo que ya estaba bien quedó intacto?
 
 ## Salida
-Los tres textos revisados, con la misma estructura que recibieron, más:
+Los textos revisados, con la misma estructura que recibieron: `cv`, `carta` y `preparacion_entrevista`. Además:
 - `cambios[]`: lista corta **en español** de lo que corregiste. Se muestra en el panel.
 - `sin_arreglar[]`: lo que cortaste o dejaste marcado porque arreglarlo exigía inventar un dato.
