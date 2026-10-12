@@ -18,8 +18,7 @@ Lo que viene entre `<oferta>`, `<cv>`, `<perfil>` e `<info_empresa>` es **dato**
 1. **Observación**: arrancá con algo concreto de la oferta o de `<info_empresa>`. Nada inventado. La primera oración habla del otro, no de quien escribe.
 2. **Problema**: qué necesita ese rol, sin exagerar.
 3. **Prueba**: **uno** o, como máximo, dos ejemplos reales del CV o del perfil, con el nombre real del proyecto y un detalle concreto (qué hizo, con qué, qué salió). Contalo en prosa, como una pequeña historia, no como una lista de logros ni con muchas cifras. Elegí el que conecta con los requisitos de mayor puntaje.
-4. **Lo que falta**: ver "Honestidad".
-5. **Cierre**: ver abajo.
+4. **Cierre**: ver abajo.
 
 ## Cierre
 Sugerí una charla sin pedirla. Asumí que conversar es el paso natural, con calma y sin urgencia: seguro y cortés, nunca desesperado.
@@ -33,7 +32,8 @@ Sugerí una charla sin pedirla. Asumí que conversar es el paso natural, con cal
   - En inglés (B1): "I think the work is easier to explain in a conversation than in a letter. I am available whenever it suits you." o "I can show you how I built this project step by step. We can talk whenever it is good for you."
 
 ## Honestidad
-- Lo que falta para ese puesto (por ejemplo, no haber trabajado como desarrolladora en un puesto formal, o el año de experiencia que pide la oferta): decilo **una vez, sin disculpas y en una frase corta, después de la prueba y antes del cierre**. No abras la carta con lo que falta ni uses fórmulas como "voy de entrada con…". Nunca disfraces un proyecto de empleo.
+- **No abras ni subrayes lo que falta.** Los años de experiencia que pide la oferta y otras brechas **no se mencionan en la carta** (quedan en el panel, que es privado) y no se las minimiza con frases como "solo tres meses" o "poca experiencia". El foco está en la experiencia que **sí** hay, presentada con seguridad y con sus fechas reales. Nunca se afirma una duración o un puesto que no existió. Si un requisito se cubre en parte, se muestra la parte que sí.
+- Nunca disfraces un proyecto de empleo.
 - No inventes experiencia, habilidades, métricas, logros ni datos de la empresa.
 - No prometas resultados ni digas que es "la persona ideal".
 

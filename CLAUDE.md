@@ -23,8 +23,8 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **Modelo:** `sonnet` por defecto, configurable con una variable en `.env`.
 - **Privacidad:** el texto del CV y la oferta sale hacia Anthropic. En planes de consumo puede usarse para entrenar si está activado el ajuste de mejora del modelo en claude.ai, **que la usuaria debe revisar y apagar**. La app en sí no guarda nada.
 - **Cupo:** el uso sale del límite del plan Pro, compartido con su trabajo diario. Si se llega al límite, la app lo explica con un mensaje claro.
-- **Medición de llamadas (Exactian, 2026-10-12, costos estimados a precios de API, referencia de uso):** 3 llamadas ≈ 0,50 USD y 2,7 minutos (idiomas 0,01; análisis+CV+carta+guía 0,32; revisión 0,18); fundiendo la revisión en la llamada grande (2 llamadas) ≈ 0,40 USD y 2,6 minutos. Calidad parecida, pero con la revisión fundida `cambios[]` deja de reflejar correcciones reales. Decisión pendiente de la usuaria.
-- **Llamadas por postulación (provisorio, se mide en la Fase 2):** 1) extraer idiomas y niveles del CV; 2) análisis + CV + carta + guía de entrevista; 3) revisión anti-IA. Se evalúa fundir la 1 o la 3 si gasta demasiado cupo.
+- **Medición de llamadas (Exactian, 2026-10-12, costos estimados a precios de API, referencia de uso):** 3 llamadas ≈ 0,50 USD y 2,7 minutos (idiomas 0,01; análisis+CV+carta+guía 0,32; revisión 0,18); fundiendo la revisión en la llamada grande (2 llamadas) ≈ 0,40 USD y 2,6 minutos. Calidad parecida, pero con la revisión fundida `cambios[]` deja de reflejar correcciones reales. **Decisión (usuaria, 2026-10-12): 3 llamadas.**
+- **Llamadas por postulación (3):** 1) extraer idiomas y niveles del CV; 2) análisis + CV + carta + guía de entrevista; 3) revisión anti-IA. Se evalúa fundir la 1 o la 3 si gasta demasiado cupo.
 - **Corre solo en la PC de la usuaria (`localhost`).** Sin servidor publicado, por eso no hay login.
 - **Stack:** TypeScript + Next.js (pantalla y rutas del servidor en una sola app).
   - `zod`: validar la respuesta por segunda vez (Claude Code ya valida contra el esquema).
@@ -41,6 +41,10 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **PDF escaneado (sin texto):** error claro pidiendo un PDF con texto o un .docx.
 - **Revisión anti-IA:** solo corta, reemplaza por hechos del CV, ordena y varía el ritmo; nunca agrega contenido. Devuelve `cambios[]` (se muestran en el panel) y `sin_arreglar[]`. Guiones largos: ninguno en el CV, uno como máximo en la carta, ninguno en las preguntas de la guía.
 - **Controles con código (se hacen en la Fase 3, sin IA y sin gastar cupo):** 1) lista negra de frases: si después de la revisión sigue apareciendo alguna muletilla prohibida, se pide un reintento sobre esa parte; 2) control de hechos: los números, años y nombres propios del texto final deben estar en el CV original o el perfil; si aparece uno nuevo, se avisa en el panel. No reemplazan las reglas del prompt: son un cinturón de seguridad.
+- **Años de experiencia que pide la oferta: filtro blando.** No se descarta la candidatura por eso. El panel (privado) lo avisa con una alerta, y la carta **no abre ni subraya lo que falta** ni lo minimiza; se centra en la experiencia que sí hay, sin inventar nada.
+- **Título del CV ajustable:** se parte de la lista del perfil y se puede ajustar a la oferta con una variante respaldada por evidencia; el panel lo avisa (alerta `titulo_ajustado`).
+- **Logros de etapas intermedias:** se pueden citar indicando la etapa (por ejemplo, el trigger de auditoría de BookLibre, entrega 1), sin presentarlos como el resultado final.
+- **Contrato del Banco Nación:** el CV no aclara el tipo de contrato; el trabajo cuenta como experiencia laboral.
 - **Carta:** cierre que sugiere una charla de forma cortés, sin pedirla, sin urgencia y sin "contratame" (ver `prompts/03-carta.md`).
 - **Descartado:** el flujo donde la app da un prompt, se pega en un chat de IA y se vuelve a pegar la respuesta. También la API de Anthropic y el diseño para open source.
 

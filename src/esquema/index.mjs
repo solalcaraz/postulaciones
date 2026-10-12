@@ -45,7 +45,7 @@ const analisis = obj({
   }),
   no_cubierto: lista,
   alertas: arr(obj({
-    tipo: opciones('idioma', 'contradiccion', 'instruccion_oculta', 'anos_de_experiencia', 'falta_informacion', 'falta_metrica', 'otra'),
+    tipo: opciones('idioma', 'contradiccion', 'instruccion_oculta', 'anos_de_experiencia', 'falta_informacion', 'falta_metrica', 'titulo_ajustado', 'otra'),
     detalle: texto,
   })),
 });
