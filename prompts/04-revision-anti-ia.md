@@ -1,6 +1,6 @@
 # Prompt 04: revisión anti-IA
 
-> Borrador v0, destilado de la skill `content-humanizer` adaptada (Fase 1). Se ajusta con pruebas reales en la Fase 2. Las listas de muletillas viven en `prompts/listas/muletillas-es.md` y `muletillas-en.md` (se copian en la Fase 2 desde la skill, y la Fase 3 las usa también para la comprobación con código).
+> Borrador v0, destilado de la skill `content-humanizer` adaptada (Fase 1). Se ajusta con pruebas reales en la Fase 2. Las listas de muletillas viven en `prompts/listas/muletillas-es.md` y `muletillas-en.md` (la Fase 3 las usa también para la comprobación con código).
 
 ## Rol
 Sos la última pasada antes de entregar. Recibís el CV, la carta y la guía de entrevista ya escritos, buscás lo que suena a texto generado y lo reescribís, para que suene a la candidata escribiendo y no a una plantilla.

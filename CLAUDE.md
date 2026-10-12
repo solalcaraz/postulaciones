@@ -13,7 +13,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 
 ## Estado
 - Fase 0 (decisiones y plan): hecha.
-- Fase 1 (skills y tono): en curso. Adaptaciones hechas: 1 de 7 (`interview-system-designer`), 2 de 7 (`cold-email`, base de la carta), 3 de 7 (`content-humanizer`, revisión anti-IA) 4 de 7 (`marketing-context`, perfil de candidata) y 5 de 7 (`verificador-restricciones-cliente`, auditor de pruebas). Hay un borrador de `datos-privados/perfil.md` pendiente de revisión de la usuaria. Todavía no hay código de la app.
+- Fase 1 (skills y tono): en curso. Adaptaciones hechas: 1 de 7 (`interview-system-designer`), 2 de 7 (`cold-email`, base de la carta), 3 de 7 (`content-humanizer`, revisión anti-IA) 4 de 7 (`marketing-context`, perfil de candidata) 5 de 7 (`verificador-restricciones-cliente`, auditor de pruebas), 6 de 7 (`copy-editing`, guía de viñetas del CV) y 7 de 7 (`revisor-textos-web`, se usa tal cual en las pruebas; ver `pruebas/revision-textos.md`). **Falta cerrar la Fase 1 con la confirmación de las tres propuestas de tono pendientes en `tono.md`** (CV, carta en español y carta en inglés). Hay un borrador de `datos-privados/perfil.md` pendiente de revisión de la usuaria. Todavía no hay código de la app.
 - Especificación completa: `prompt-2-herramienta-postulacion.md` (fases, flujo de pantalla, criterios de aceptación). Hay dos cambios sobre ella, listados en "Decisiones tomadas": el proveedor de IA y la guía de entrevista.
 
 ## Decisiones tomadas (no cambiar sin preguntar)
@@ -49,7 +49,7 @@ Todavía no hay app. Cuando exista:
 4. `npm run dev` y abrir `http://localhost:3000`.
 
 ## Estructura prevista
-- `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; `02-cv.md` es un borrador con las reglas de CV de la usuaria).
+- `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; `02-cv.md` es un borrador con las reglas de CV y la guía de viñetas). Las listas de palabras están en `prompts/listas/`.
 - `src/llm/`, `src/lectura/`, `src/docx/`, `src/esquema/`, `app/`.
 - `plantillas/`: plantilla vacía del perfil (sin datos personales).
 - `pruebas/verificador.md`: las 15 restricciones para auditar los resultados (Fase 5). La verificación con IA **no corre dentro de la app** (gastaría una llamada más del plan); lo automático lo cubren los controles con código de la Fase 3.
