@@ -1,0 +1,21 @@
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Datos personales: CV, ofertas de prueba y perfil. Nunca al repositorio.
+datos-privados/
+
+# Dependencias y builds
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Sistema y editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
