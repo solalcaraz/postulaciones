@@ -41,7 +41,7 @@ Usá la lista del idioma de cada texto.
 1. ¿Cada hecho del texto revisado sigue estando en `<cv_original>` o `<perfil>`?
 2. ¿No apareció ningún nombre, fecha o número nuevo?
 3. ¿El nivel de idioma no subió?
-4. ¿El cierre de la carta y la frase sobre la experiencia formal siguen?
+4. ¿El cierre de la carta sigue tal cual?
 5. ¿Un párrafo que ya estaba bien quedó intacto?
 
 ## Salida
