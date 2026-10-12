@@ -13,7 +13,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 
 ## Estado
 - Fase 0 (decisiones y plan): hecha.
-- Fase 1 (skills y tono): en curso. Adaptaciones hechas: 1 de 7 (`interview-system-designer`) y 2 de 7 (`cold-email`, base de la carta). Todavía no hay código de la app.
+- Fase 1 (skills y tono): en curso. Adaptaciones hechas: 1 de 7 (`interview-system-designer`), 2 de 7 (`cold-email`, base de la carta) y 3 de 7 (`content-humanizer`, revisión anti-IA). Todavía no hay código de la app.
 - Especificación completa: `prompt-2-herramienta-postulacion.md` (fases, flujo de pantalla, criterios de aceptación). Hay dos cambios sobre ella, listados en "Decisiones tomadas": el proveedor de IA y la guía de entrevista.
 
 ## Decisiones tomadas (no cambiar sin preguntar)
@@ -34,6 +34,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - **Idioma:** español o inglés según la oferta (Auto / Español / Inglés). Si la oferta está en otro idioma en modo Auto, la app avisa y pide elegir; no genera hasta que se elija.
 - **Fuente de verdad del contenido:** el CV subido + `datos-privados/perfil.md` (local, ignorado por git). La app solo lee el perfil, nunca lo escribe. Si perfil y CV se contradicen, se avisa en el panel; no se elige uno en silencio.
 - **PDF escaneado (sin texto):** error claro pidiendo un PDF con texto o un .docx.
+- **Revisión anti-IA:** solo corta, reemplaza por hechos del CV, ordena y varía el ritmo; nunca agrega contenido. Devuelve `cambios[]` (se muestran en el panel) y `sin_arreglar[]`. Guiones largos: ninguno en el CV, uno como máximo en la carta, ninguno en las preguntas de la guía.
 - **Carta:** cierre que sugiere una charla de forma cortés, sin pedirla, sin urgencia y sin "contratame" (ver `prompts/03-carta.md`).
 - **Descartado:** el flujo donde la app da un prompt, se pega en un chat de IA y se vuelve a pegar la respuesta. También la API de Anthropic y el diseño para open source.
 
@@ -45,7 +46,7 @@ Todavía no hay app. Cuando exista:
 4. `npm run dev` y abrir `http://localhost:3000`.
 
 ## Estructura prevista
-- `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`; faltan `02-cv` y `04-revision-anti-ia`).
+- `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; falta `02-cv`).
 - `src/llm/`, `src/lectura/`, `src/docx/`, `src/esquema/`, `app/`.
 - `datos-privados/`: CV de prueba, ofertas y `perfil.md`. **Ignorada por git.**
 
