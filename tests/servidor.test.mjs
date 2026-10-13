@@ -140,7 +140,27 @@ test('no deja empezar una segunda postulación mientras hay una en curso', () =>
   assert.equal((await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar() })).estado, 202);
 }));
 
-test('si la IA falla, el trabajo termina con un mensaje claro', () => conServidor({ llamarFn: iaPorEsquema({ error: new ErrorIA('Se llegó al límite de uso de tu plan de Claude.', 'limite') }) }, async ({ pedir }) => {
+test('si la IA devuelve un formato roto dos veces, la pantalla recibe un error claro y no se crea ningún CV', async () => {
+  const base = iaPorEsquema();
+  let intentosDeGeneracion = 0;
+  const llamarFn = async (pedido) => {
+    if (!pedido.esquema.properties.analisis) return base(pedido);
+    intentosDeGeneracion++;
+    const { resultado } = await base(pedido);
+    delete resultado.cv;
+    return { resultado, costoEstimadoUsd: 0.1, duracionMs: 1 };
+  };
+  await conServidor({ llamarFn }, async ({ pedir }) => {
+    const { id } = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar() })).json();
+    const t = await esperar(pedir, id);
+    assert.equal(t.estado, 'error');
+    assert.match(t.error, /formato/i);
+    assert.equal(intentosDeGeneracion, 2, 'reintenta una sola vez');
+    assert.equal((await pedir(`/api/trabajo/${id}/cv`)).estado, 409);
+  });
+});
+
+test('si la IA falla, el trabajo termina con un mensaje claro',() => conServidor({ llamarFn: iaPorEsquema({ error: new ErrorIA('Se llegó al límite de uso de tu plan de Claude.', 'limite') }) }, async ({ pedir }) => {
   const { id } = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar() })).json();
   const t = await esperar(pedir, id);
   assert.equal(t.estado, 'error');
