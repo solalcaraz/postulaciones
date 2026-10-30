@@ -10,7 +10,7 @@ import { crearServidor } from '../../app/servidor.mjs';
 import { generarCv } from '../../src/docx/generar.mjs';
 import { CV_ES, OFERTA, PERFIL, iaPorEsquema } from '../ayudas.mjs';
 
-// Con PANTALLA_REAL=1 usa Claude de verdad, tu perfil y los archivos PANTALLA_CV y PANTALLA_OFERTA (gasta cupo de tu plan).
+// Con PANTALLA_REAL=1 usa Claude de verdad, tu perfil y los archivos PANTALLA_CV y PANTALLA_OFERTA (gasta cupo de tu plan). Las dos rutas tienen que ser absolutas: con una relativa, Chrome no adjunta el CV.
 const real = process.env.PANTALLA_REAL === '1';
 const CHROME = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const capturas = process.argv[2] || 'datos-privados/capturas';
@@ -83,6 +83,7 @@ try {
     await evaluar(`document.querySelector('#usar-celular').click()`);
     await evaluar(`document.querySelector('#celular').value = '11 5555 0000'`);
   }
+  if (real) await evaluar(`document.querySelector('#usar-guia').click()`);
   await evaluar(`document.querySelector('#empresa').value = 'Empresa'`);
   await evaluar(`document.querySelector('#continuar').click()`);
   await esperar(`!document.querySelector('#paso-niveles').hidden`, real ? 120000 : 20000);
