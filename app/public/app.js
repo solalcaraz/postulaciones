@@ -263,7 +263,7 @@ function mostrarResultado(r) {
       el('p', { class: 'etiqueta' }, 'Datos que no están en tu CV, tu perfil ni la oferta (revisalos)'), lista(c.datosNuevos.map((d) => `${d.tipo} "${d.valor}" en ${d.donde}`)),
       avisos.length ? [el('p', { class: 'etiqueta' }, 'Avisos'), lista(avisos)] : null),
   ];
-  $('resultado').replaceChildren(...contenido);
+  $('resultado').replaceChildren(...contenido.filter(Boolean));
   mostrarPaso('paso-resultado');
 }
 
