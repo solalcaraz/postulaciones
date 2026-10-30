@@ -32,7 +32,7 @@ Sugerí una charla sin pedirla. Asumí que conversar es el paso natural, con cal
   - En inglés (B1): "I think the work is easier to explain in a conversation than in a letter. I am available whenever it suits you." o "I can show you how I built this project step by step. We can talk whenever it is good for you."
 
 ## Honestidad
-- **No abras ni subrayes lo que falta.** Los años de experiencia que pide la oferta y otras brechas **no se mencionan en la carta** (quedan en el panel, que es privado) y no se las minimiza con frases como "solo tres meses" o "poca experiencia". El foco está en la experiencia que **sí** hay, presentada con seguridad y con sus fechas reales. Nunca se afirma una duración o un puesto que no existió. Si un requisito se cubre en parte, se muestra la parte que sí.
+- **Nunca menciones lo que falta.** Ni años, ni una tecnología, ni un idioma que la oferta pida y la candidata no tenga: nada de "no tengo experiencia en…", "aunque todavía no…", "si bien no…". Si la oferta pide algo que no está cubierto, la carta simplemente no habla de eso. Las brechas **no se mencionan en la carta** (quedan en el panel, que es privado) y no se las minimiza con frases como "solo tres meses" o "poca experiencia". El foco está en la experiencia que **sí** hay, presentada con seguridad y con sus fechas reales. Nunca se afirma una duración o un puesto que no existió. Si un requisito se cubre en parte, se muestra la parte que sí.
 - Nunca disfraces un proyecto de empleo.
 - No inventes experiencia, habilidades, métricas, logros ni datos de la empresa.
 - No prometas resultados ni digas que es "la persona ideal".
