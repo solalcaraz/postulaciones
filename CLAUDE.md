@@ -4,10 +4,10 @@ Este archivo se entiende solo, sin contexto previo. Mantenerlo actualizado.
 
 ## Qué es
 Herramienta **privada y de uso personal**. No se diseña para otras personas ni para publicarse. La usuaria sube su CV completo (PDF o .docx) y pega el texto de una oferta de trabajo. La herramienta devuelve:
-- un **CV en .docx editable**, enfocado en esa oferta;
+- un **CV en .docx editable**, enfocado en esa oferta, de **una sola página**;
 - una **carta corta en texto plano**, con botón "Copiar";
-- un **panel de análisis**: qué se priorizó, qué se dejó afuera y qué pide la oferta que el CV no cubre;
-- una **guía "preparate para una entrevista"**, en texto plano con botón "Copiar".
+- un **panel de análisis**: qué se priorizó, qué se dejó afuera, qué pide la oferta que el CV no cubre y una **nota de sugerencias** (título o tecnología que podría sostener, o brecha) que no se aplica sola al CV;
+- una **guía "preparate para una entrevista"**, en texto plano con botón "Copiar", **solo si se tilda la casilla** (por defecto no se genera).
 
 Una IA escribe el contenido y se comporta como un **reclutador con experiencia**. Es un proyecto independiente del portfolio.
 
@@ -21,6 +21,7 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 - Especificación completa: `prompt-2-herramienta-postulacion.md` (fases, flujo de pantalla, criterios de aceptación). Hay dos cambios sobre ella, listados en "Decisiones tomadas": el proveedor de IA y la guía de entrevista.
 
 ## Decisiones tomadas (no cambiar sin preguntar)
+- **Ajuste del 30/10/2026 (auditoría contra una especificación nueva de la usuaria):** 1) la guía de entrevista es opcional (casilla en la pantalla, `--guia` en la terminal; sin ella ni se pide a la IA); 2) la nota de sugerencias (`analisis.sugerencias`: `titulo`, `tecnologia` o `brecha`, con motivo y respaldo) no se aplica sola al CV; 3) el CV es de **una página**, con una única excepción: una segunda hoja que lleve **1/4 de página o menos** (el panel lo avisa como caso límite); 4) las páginas se **miden** convirtiendo el .docx a PDF (`src/docx/paginas.mjs`: usa Word, o LibreOffice si está instalado), no se estiman; si no entra se pide acortarlo a la IA (`prompts/06-acortar.md`, hasta 2 veces); 5) **Proyectos va antes que Experiencia**; 6) la carta **nunca menciona lo que falta** (frases como "no tengo experiencia en" están en la lista negra). Se mantiene el tono de siempre y el saludo "Hola, ¿qué tal?". Se borró `scripts/generar-cv.mjs` (no lo usaba la app).
 - **Proveedor de IA: Claude Code en modo no interactivo (`claude -p`), con la suscripción Claude Pro de la usuaria.** Sin clave de API y sin costo extra. Cambió el 12/10/2026 respecto de la Fase 0 (que había elegido la API) porque la usuaria ya usa este camino en otro sistema suyo: `C:\Users\alcar\Desktop\rumbo-españa\app\lib\ia.js`. **Reutilizar ese módulo como base**: llama a `claude -p --output-format json --json-schema` con `--no-session-persistence` (no deja la conversación guardada), `--setting-sources ''` y `--strict-mcp-config` (no lee `CLAUDE.md`, hooks ni MCP), `--tools ''` (la IA no usa herramientas) y traduce los errores a mensajes claros.
 - **Instrucciones por entrada estándar:** el límite de la línea de comandos de Windows es de unos 32.000 caracteres y cada llamada arma unos 40.000; por eso las instrucciones y los datos van por stdin y el `--system-prompt` es corto.
 - **Modelo:** `sonnet` por defecto, configurable con una variable en `.env`.
@@ -35,9 +36,9 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
   - `mammoth`: leer .docx.
   - `docx`: generar el .docx.
 - **Títulos de sección del .docx:** se traducen por código según el idioma (Experience, Projects, Education, Skills, Languages). Las listas de frases prohibidas están en `prompts/listas/prohibidas.json`. El control de datos nuevos revisa números, enlaces y términos técnicos (CamelCase y siglas); no revisa nombres propios comunes y puede marcar traducciones (por ejemplo, "ATMs" por "cajeros").
-- **Límite de páginas:** el CV se estima en páginas por caracteres (no hay motor de Word); el panel avisa si pasa de 2.
+- **Límite de páginas:** una hoja (o dos con la segunda al 25 % como máximo), medido en un PDF real. Si no hay Word ni LibreOffice, se cae a una estimación por caracteres y el panel lo avisa. El PDF temporal se borra apenas se mide.
 - **Dependencias:** `unpdf` (leer PDF), `mammoth` (leer Word), `docx` (generar Word) y `ajv` (validar contra el JSON Schema). `npm audit` marca una vulnerabilidad moderada en `sprintf-js`, dependencia de `mammoth`: el arreglo propuesto baja a una versión vieja y el riesgo es bajo en una app local; se deja anotado.
-- **Entrada:** CV en PDF o .docx + oferta en texto pegado. **Salida:** .docx editable + carta copiable + panel de análisis + guía de entrevista copiable (agregada el 12/10/2026 sobre la especificación original). La IA devuelve, en este orden: `analisis`, `cv`, `carta`, `preparacion_entrevista`.
+- **Entrada:** CV en PDF o .docx + oferta en texto pegado. **Salida:** .docx editable + carta copiable + panel de análisis (con sugerencias) + guía de entrevista copiable solo si se pide. La IA devuelve, en este orden: `analisis`, `cv`, `carta` y, si se pidió, `preparacion_entrevista`.
 - **Panel de análisis:** siempre en español, aunque la oferta y el CV generado estén en inglés. Puntaje de 0 a 3 por requisito, con cita textual del CV.
 - **Guía de entrevista:** las preguntas van en el idioma de la oferta (sin traducción); las notas, en español.
 - **Idioma:** español o inglés según la oferta (Auto / Español / Inglés). Si la oferta está en otro idioma en modo Auto, la app avisa y pide elegir; no genera hasta que se elija.
@@ -61,11 +62,11 @@ Una IA escribe el contenido y se comporta como un **reclutador con experiencia**
 3. Doble clic en `Abrir Postulaciones.cmd` (o `npm start`) y se abre `http://127.0.0.1:4400`. La ventana negra tiene que quedar abierta: si se cierra, la herramienta se apaga.
 4. Opcional: `cp .env.example .env` para cambiar el modelo.
 
-Hoy, sin pantalla (Fase 3): `node scripts/postular.mjs --oferta <archivo> --cv <pdf o docx> --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Nombre]` (`--dry` arma los textos sin llamar a la IA). Deja el .docx, la carta, la guía y el panel en `datos-privados/salidas/`. Pruebas automáticas: `npm test`.
+Hoy, sin pantalla (Fase 3): `node scripts/postular.mjs --oferta <archivo> --cv <pdf o docx> --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Nombre]` (`--guia` también arma la guía de entrevista; `--dry` arma los textos sin llamar a la IA). Deja el .docx, la carta, la guía y el panel en `datos-privados/salidas/`. Pruebas automáticas: `npm test`.
 
 ## Estructura prevista
 - `prompts/`: los prompts del reclutador, en archivos propios y versionados (`01-analisis-reclutador.md`, `03-carta.md`, `04-revision-anti-ia.md`; `02-cv.md` es un borrador con las reglas de CV y la guía de viñetas). Las listas de palabras están en `prompts/listas/`.
-- `src/ia.mjs` (llama a Claude Code), `src/esquema/index.mjs` (formato de las respuestas, JSON Schema), `src/prompts.mjs` (arma cada llamada), `src/postular.mjs` (flujo completo: 3 llamadas, validación con un reintento, controles y .docx), `src/lectura/` (PDF, Word y datos de contacto del perfil), `src/validacion/` (esquema y controles con código), `src/docx/generar.mjs` (el .docx), `src/panel.mjs` (panel en texto), `scripts/postular.mjs` (corre todo desde la terminal) y `scripts/generar-cv.mjs` (convierte un CV en JSON a .docx). `app/servidor.mjs` (servidor local: solo escucha en 127.0.0.1, exige una cabecera propia en los POST y revisa el Host; el trabajo en curso vive solo en memoria y se borra a los 30 minutos), `app/public/` (la pantalla: se muestra todo como texto, nunca como HTML) y `tests/e2e/pantalla.mjs` (prueba en un Chrome real).
+- `src/ia.mjs` (llama a Claude Code), `src/esquema/index.mjs` (formato de las respuestas, JSON Schema), `src/prompts.mjs` (arma cada llamada), `src/postular.mjs` (flujo completo: 3 llamadas, validación con un reintento, controles y .docx), `src/lectura/` (PDF, Word y datos de contacto del perfil), `src/validacion/` (esquema y controles con código), `src/docx/generar.mjs` (el .docx), `src/panel.mjs` (panel en texto), `scripts/postular.mjs` (corre todo desde la terminal), `src/docx/paginas.mjs` (mide las páginas en un PDF real) y `prompts/06-acortar.md`. En `tests/ofertas/` hay 6 ofertas inventadas para probar casos (backend con empresa, frontend sin empresa, años e inglés avanzado, tecnología que falta, CI/CD, oferta amplia). `app/servidor.mjs` (servidor local: solo escucha en 127.0.0.1, exige una cabecera propia en los POST y revisa el Host; el trabajo en curso vive solo en memoria y se borra a los 30 minutos), `app/public/` (la pantalla: se muestra todo como texto, nunca como HTML) y `tests/e2e/pantalla.mjs` (prueba en un Chrome real).
 - `plantillas/`: plantilla vacía del perfil (sin datos personales).
 - `pruebas/verificador.md`: las 15 restricciones para auditar los resultados (Fase 5). La verificación con IA **no corre dentro de la app** (gastaría una llamada más del plan); lo automático lo cubren los controles con código de la Fase 3.
 - `datos-privados/`: CVs, ofertas de prueba y `perfil.md`. **Ignorada por git.**
