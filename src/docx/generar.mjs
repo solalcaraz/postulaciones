@@ -45,19 +45,19 @@ export async function generarCv({ cv, contacto = {}, celular = '', idioma = 'es'
 
   if (cv.resumen) { seccion(t.resumen); agregar({ spacing: { after: 40 } }, texto(cv.resumen)); contar(cv.resumen); }
 
-  if (cv.experiencia?.length) {
-    seccion(t.experiencia);
-    for (const e of cv.experiencia) {
-      entrada(e.puesto, [e.organizacion, e.lugar_y_modalidad, e.fechas].filter(Boolean).join(' · '));
-      e.puntos.forEach(viñeta);
-    }
-  }
   if (cv.proyectos?.length) {
     seccion(t.proyectos);
     for (const p of cv.proyectos) {
       entrada(p.nombre, [p.encabezado, p.fecha].filter(Boolean).join(' · '));
       if (p.enlaces?.length) { agregar({ spacing: { after: 20 } }, texto(p.enlaces.join(' · '), { color: '404040' })); contar(p.enlaces.join(' · ')); }
       p.puntos.forEach(viñeta);
+    }
+  }
+  if (cv.experiencia?.length) {
+    seccion(t.experiencia);
+    for (const e of cv.experiencia) {
+      entrada(e.puesto, [e.organizacion, e.lugar_y_modalidad, e.fechas].filter(Boolean).join(' · '));
+      e.puntos.forEach(viñeta);
     }
   }
   if (cv.formacion?.length) {

@@ -21,7 +21,7 @@ before(async () => {
 after(() => rm(carpeta, { recursive: true, force: true }));
 
 async function conServidor(opciones, prueba) {
-  const app = crearServidor({ rutaPerfil, ejecutableClaude: 'programa-que-no-existe', ...opciones });
+  const app = crearServidor({ rutaPerfil, ejecutableClaude: 'programa-que-no-existe', medirFn: async () => ({ paginas: 1, ultima: 1 }), ...opciones });
   const puerto = await app.escuchar(0);
   const base = `http://127.0.0.1:${puerto}`;
   const pedir = async (ruta, { metodo = 'GET', cuerpo, cabeceras = {} } = {}) => {
@@ -166,4 +166,11 @@ test('si la IA falla, el trabajo termina con un mensaje claro',() => conServidor
   assert.equal(t.estado, 'error');
   assert.match(t.error, /límite de uso/);
   assert.equal((await pedir(`/api/trabajo/${id}/cv`)).estado, 409);
+}));
+
+test('la guía de entrevista llega solo si se la pidió', () => conServidor({ llamarFn: iaPorEsquema() }, async ({ pedir }) => {
+  const sin = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar() })).json();
+  assert.equal((await esperar(pedir, sin.id)).resultado.guiaTexto, '');
+  const con = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar({ guia: true }) })).json();
+  assert.match((await esperar(pedir, con.id)).resultado.guiaTexto, /¿Qué hiciste\?/);
 }));

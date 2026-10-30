@@ -72,7 +72,7 @@ function verificarClaude(ejecutable) {
   });
 }
 
-export function crearServidor({ llamarFn, rutaPerfil = join(RAIZ, 'datos-privados', 'perfil.md'), ejecutableClaude = process.env.POSTULA_CLAUDE || 'claude' } = {}) {
+export function crearServidor({ llamarFn, medirFn, rutaPerfil = join(RAIZ, 'datos-privados', 'perfil.md'), ejecutableClaude = process.env.POSTULA_CLAUDE || 'claude' } = {}) {
   const trabajos = new Map();
   let puerto = 0;
 
@@ -89,7 +89,7 @@ export function crearServidor({ llamarFn, rutaPerfil = join(RAIZ, 'datos-privado
 
   async function rutaGenerar(req) {
     if ([...trabajos.values()].some((t) => t.estado === 'en curso')) throw new ErrorPedido('Ya hay una postulación en curso. Esperá a que termine.', 409);
-    const { archivo, oferta, infoEmpresa, idioma, niveles, celular, empresa } = await leerCuerpo(req);
+    const { archivo, oferta, infoEmpresa, idioma, niveles, celular, empresa, guia } = await leerCuerpo(req);
     const cv = await textoDelCv(archivo);
     const textoOferta = validarOferta(oferta);
     if (!['es', 'en'].includes(idioma)) throw new ErrorPedido('Elegí el idioma del CV: español o inglés.');
@@ -106,12 +106,12 @@ export function crearServidor({ llamarFn, rutaPerfil = join(RAIZ, 'datos-privado
 
     generarPostulacion({
       cv, oferta: textoOferta, perfil, infoEmpresa: String(infoEmpresa || ''), idiomaSalida: idioma, niveles,
-      celular: String(celular || '').slice(0, 40), empresa: String(empresa || '').slice(0, 60), llamarFn,
+      celular: String(celular || '').slice(0, 40), empresa: String(empresa || '').slice(0, 60), conGuia: guia === true, llamarFn, medirFn,
       alPaso: (m) => { trabajo.mensaje = m; },
     }).then((r) => {
       const { docx, ...resto } = r;
       trabajo.estado = 'listo';
-      trabajo.resultado = { ...resto, docx: { nombre: docx.nombre, paginasEstimadas: docx.paginasEstimadas } };
+      trabajo.resultado = { ...resto, docx: { nombre: docx.nombre } };
       trabajo.buffer = docx.buffer;
     }).catch((e) => {
       trabajo.estado = 'error';

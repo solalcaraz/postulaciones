@@ -48,6 +48,7 @@ export const ANALISIS = {
   requisitos: [{ texto: 'Kotlin', tipo: 'filtro', puntaje: 3, cita_del_cv: 'Kotlin, PostgreSQL, React', justificacion: 'Lo usó.' }],
   decisiones_del_cv: { prioriza: ['Tienda de ejemplo'], deja_afuera: [], orden: ['Proyectos'] },
   no_cubierto: [],
+  sugerencias: [{ tipo: 'tecnologia', sugerido: 'CI/CD', motivo: 'La oferta lo pide.', respaldo: 'Tienda de ejemplo: integración continua.' }],
   alertas: [],
 };
 
@@ -98,7 +99,8 @@ export function iaPorEsquema({ espera = 0, error = null } = {}) {
   return async ({ esquema }) => {
     if (espera) await new Promise((r) => setTimeout(r, espera));
     if (error) throw error;
-    const resultado = esquema.properties.cv_idiomas ? IDIOMAS : esquema.properties.analisis ? resultadoEjemplo() : revisionEjemplo();
+    const resultado = esquema.properties.cv_idiomas ? IDIOMAS : esquema.properties.analisis ? resultadoEjemplo() : Object.keys(esquema.properties).length === 1 ? { cv: CV_ES } : revisionEjemplo();
+    if (!esquema.properties.preparacion_entrevista) delete resultado.preparacion_entrevista; // la guía es opcional
     return { resultado: structuredClone(resultado), costoEstimadoUsd: 0.1, duracionMs: 1 };
   };
 }

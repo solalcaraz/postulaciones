@@ -3,7 +3,7 @@
 //   node scripts/postular.mjs --oferta datos-privados/ofertas/exactian-soporte-tecnico.md --cv "datos-privados/mi-cv.docx" \
 //        --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Exactian]
 //
-// Opciones: --info <archivo> (información extra de la empresa) · --idioma auto|es|en · --salida <carpeta> · --dry (arma los textos, no llama a la IA)
+// Opciones: --guia (también arma la guía de entrevista; sin esto no se genera) · --info <archivo> (información extra de la empresa) · --idioma auto|es|en · --salida <carpeta> · --dry (arma los textos, no llama a la IA)
 // Si no se pasa --niveles, muestra los que detectó en el CV y se detiene: es la confirmación que después hará la pantalla.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { basename, join } from 'node:path';
@@ -68,8 +68,9 @@ if (args.dry) {
   process.exit(0);
 }
 
+const conGuia = args.guia === true;
 const r = await generarPostulacion({
-  cv, oferta, perfil, infoEmpresa, idiomaSalida, niveles: nivelesFinales,
+  cv, oferta, perfil, infoEmpresa, idiomaSalida, niveles: nivelesFinales, conGuia,
   celular: args.celular === true ? '' : args.celular || '', empresa: args.empresa || '',
   alPaso: (m) => console.log(`▶ ${m}`),
 });
@@ -77,9 +78,9 @@ const r = await generarPostulacion({
 await mkdir(carpeta, { recursive: true });
 await writeFile(join(carpeta, r.docx.nombre), r.docx.buffer);
 await writeFile(join(carpeta, 'carta.txt'), r.cartaTexto, 'utf8');
-await writeFile(join(carpeta, 'entrevista.txt'), r.guiaTexto, 'utf8');
+if (conGuia) await writeFile(join(carpeta, 'entrevista.txt'), r.guiaTexto, 'utf8');
 await writeFile(join(carpeta, 'panel.md'), renderPanel(r), 'utf8');
-console.log(`\n✔ Listo. Carta: ${r.palabrasCarta} palabras · CV: ~${r.docx.paginasEstimadas} pág. · costo estimado ${r.costoEstimadoUsd.toFixed(3)} USD`);
-console.log(`  Archivos en ${carpeta}: ${r.docx.nombre}, carta.txt, entrevista.txt, panel.md`);
+console.log(`\n✔ Listo. Carta: ${r.palabrasCarta} palabras · CV: ${r.paginas.cantidad} pág.${r.paginas.medido ? ` (la última llena en un ${Math.round(r.paginas.ultima * 100)} %)` : ' (estimado)'} · costo estimado ${r.costoEstimadoUsd.toFixed(3)} USD`);
+console.log(`  Archivos en ${carpeta}: ${r.docx.nombre}, carta.txt, ${conGuia ? 'entrevista.txt, ' : ''}panel.md`);
 const c = r.controles;
 console.log(`  Controles: ${c.frasesProhibidas.length} frases prohibidas · ${c.datosNuevos.length} datos para revisar · ${c.avisos.length} avisos`);

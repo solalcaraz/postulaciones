@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import { generarCv, nombreDeArchivo } from '../src/docx/generar.mjs';
 import { generarPostulacion, llamarValidado } from '../src/postular.mjs';
 import { ErrorIA } from '../src/ia.mjs';
-import { resultadoSchema } from '../src/esquema/index.mjs';
+import { resultadoSchema, sinGuia } from '../src/esquema/index.mjs';
+import { evaluarPaginas } from '../src/docx/paginas.mjs';
 import { CV_ES, CV_TEXTO, OFERTA, PERFIL, iaFalsa, leerEntradaZip, resultadoEjemplo, revisionEjemplo } from './ayudas.mjs';
 
 const contacto = { nombre: 'Ana Ejemplo', ubicacion: 'Rosario, Santa Fe', email: 'ana@ejemplo.com', linkedin: 'linkedin.com/in/ana-ejemplo', github: 'github.com/anaejemplo' };
-const base = { cv: CV_TEXTO, oferta: OFERTA, perfil: PERFIL, idiomaSalida: 'es', niveles: { es: 'nativo', en: 'B1' }, empresa: 'Empresa' };
+const unaHoja = async () => ({ paginas: 1, ultima: 1 });
+const base = { cv: CV_TEXTO, oferta: OFERTA, perfil: PERFIL, idiomaSalida: 'es', niveles: { es: 'nativo', en: 'B1' }, empresa: 'Empresa', conGuia: true, medirFn: unaHoja };
 
 test('el .docx es de una columna, sin tablas ni imágenes, con estilos y listas reales de Word', async () => {
   const { buffer } = await generarCv({ cv: CV_ES, contacto, idioma: 'es' });
@@ -103,4 +105,55 @@ test('avisa si la carta se pasa del largo pedido', async () => {
   larga.carta.cuerpo = Array.from({ length: 300 }, (_, i) => `p${i}`).join(' ');
   const r = await generarPostulacion({ ...base, llamarFn: iaFalsa([resultadoEjemplo(), larga]) });
   assert.ok(r.controles.avisos.some((a) => /150 a 220/.test(a)));
+});
+
+test('la guía de entrevista no se genera si no se pidió, y sí si se pidió', async () => {
+  const sin = iaFalsa([(() => { const r = resultadoEjemplo(); delete r.preparacion_entrevista; return r; })(), (() => { const r = revisionEjemplo(); delete r.preparacion_entrevista; return r; })()]);
+  const r1 = await generarPostulacion({ ...base, conGuia: false, llamarFn: sin });
+  assert.equal(r1.guiaTexto, '');
+  const con = iaFalsa([resultadoEjemplo(), revisionEjemplo()]);
+  const r2 = await generarPostulacion({ ...base, llamarFn: con });
+  assert.match(r2.guiaTexto, /¿Qué hiciste?/);
+  assert.ok(!('preparacion_entrevista' in sinGuia(resultadoSchema).properties));
+});
+
+test('el análisis trae la nota de sugerencias, separada del CV', async () => {
+  const r = await generarPostulacion({ ...base, llamarFn: iaFalsa([resultadoEjemplo(), revisionEjemplo()]) });
+  assert.equal(r.analisis.sugerencias[0].tipo, 'tecnologia');
+  assert.ok(!JSON.stringify(r.cv).includes('CI/CD'));
+});
+
+test('el .docx pone Proyectos antes que Experiencia', async () => {
+  const xml = leerEntradaZip((await generarCv({ cv: CV_ES, contacto, idioma: 'es' })).buffer, 'word/document.xml');
+  assert.ok(xml.indexOf('>Proyectos<') < xml.indexOf('>Experiencia<'));
+});
+
+test('las páginas: una hoja está bien; dos solo si la segunda lleva 1/4 o menos', () => {
+  assert.equal(evaluarPaginas({ paginas: 1, ultima: 0.9 }), 'ok');
+  assert.equal(evaluarPaginas({ paginas: 2, ultima: 0.25 }), 'limite');
+  assert.equal(evaluarPaginas({ paginas: 2, ultima: 0.26 }), 'largo');
+  assert.equal(evaluarPaginas({ paginas: 3, ultima: 0.1 }), 'largo');
+});
+
+test('si el CV no entra en una hoja, se pide acortarlo y se vuelve a medir', async () => {
+  const medidas = [{ paginas: 2, ultima: 0.6 }, { paginas: 1, ultima: 0.8 }];
+  const ia = iaFalsa([resultadoEjemplo(), revisionEjemplo(), { cv: { ...CV_ES, eventos_y_cursos: [] } }]);
+  const r = await generarPostulacion({ ...base, conGuia: true, llamarFn: ia, medirFn: async () => medidas.shift() });
+  assert.equal(ia.llamadas, 3);
+  assert.equal(r.paginas.cantidad, 1);
+  assert.equal(r.controles.avisos.length, 0);
+});
+
+test('la segunda hoja con 1/4 o menos se acepta y se avisa como caso límite, sin acortar', async () => {
+  const ia = iaFalsa([resultadoEjemplo(), revisionEjemplo()]);
+  const r = await generarPostulacion({ ...base, conGuia: true, llamarFn: ia, medirFn: async () => ({ paginas: 2, ultima: 0.2 }) });
+  assert.equal(ia.llamadas, 2);
+  assert.ok(r.controles.avisos.some((a) => /Caso límite/.test(a)));
+});
+
+test('una carta que menciona lo que falta se detecta como frase prohibida', async () => {
+  const sucia = revisionEjemplo();
+  sucia.carta.cuerpo += ' No tengo experiencia con Go.';
+  const r = await generarPostulacion({ ...base, conGuia: true, llamarFn: iaFalsa([resultadoEjemplo(), sucia, sucia]) });
+  assert.ok(r.controles.frasesProhibidas.some((h) => h.frase === 'no tengo experiencia'));
 });

@@ -14,7 +14,7 @@ const el = (etiqueta, props = {}, ...hijos) => {
 
 const MAX_BYTES = 8 * 1024 * 1024;
 const NIVELES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'nativo'];
-const datos = { archivo: null, oferta: '', info: '', idiomaElegido: 'auto', empresa: '', celular: '', idiomas: null, filas: [], trabajo: null };
+const datos = { archivo: null, oferta: '', info: '', idiomaElegido: 'auto', empresa: '', celular: '', guia: false, idiomas: null, filas: [], trabajo: null };
 let temporizador = null;
 
 /* ---------- utilidades ---------- */
@@ -96,7 +96,7 @@ $('formulario').addEventListener('submit', async (e) => {
   boton.textContent = 'Leyendo tu CV…';
   try {
     datos.archivo = { nombre: archivo.name, base64: await aBase64(archivo) };
-    Object.assign(datos, { oferta, info: $('info').value.trim(), idiomaElegido: $('idioma').value, empresa: $('empresa').value.trim(), celular: $('usar-celular').checked ? $('celular').value.trim() : '' });
+    Object.assign(datos, { oferta, info: $('info').value.trim(), idiomaElegido: $('idioma').value, empresa: $('empresa').value.trim(), celular: $('usar-celular').checked ? $('celular').value.trim() : '', guia: $('usar-guia').checked });
     datos.idiomas = await api('/api/idiomas', { method: 'POST', body: JSON.stringify({ archivo: datos.archivo, oferta }) });
     prepararNiveles();
     mostrarPaso('paso-niveles');
@@ -162,7 +162,7 @@ $('generar').addEventListener('click', async () => {
   try {
     const { id } = await api('/api/generar', {
       method: 'POST',
-      body: JSON.stringify({ archivo: datos.archivo, oferta: datos.oferta, infoEmpresa: datos.info, idioma: $('idioma-salida').value, niveles, celular: datos.celular, empresa: datos.empresa }),
+      body: JSON.stringify({ archivo: datos.archivo, oferta: datos.oferta, infoEmpresa: datos.info, idioma: $('idioma-salida').value, niveles, celular: datos.celular, empresa: datos.empresa, guia: datos.guia }),
     });
     datos.trabajo = id;
     mostrarPaso('paso-progreso');
@@ -201,8 +201,8 @@ const lista = (items, maximo = 8) => {
 
 function cvATexto(cv) {
   const l = [cv.titulo, '', cv.resumen, ''];
-  if (cv.experiencia.length) l.push('EXPERIENCIA', ...cv.experiencia.flatMap((e) => [`${e.puesto} · ${e.organizacion} · ${e.lugar_y_modalidad} · ${e.fechas}`, ...e.puntos.map((p) => `  - ${p}`)]), '');
   if (cv.proyectos.length) l.push('PROYECTOS', ...cv.proyectos.flatMap((p) => [`${p.nombre} · ${p.encabezado} · ${p.fecha}`, p.enlaces.join(' · '), ...p.puntos.map((x) => `  - ${x}`)]), '');
+  if (cv.experiencia.length) l.push('EXPERIENCIA', ...cv.experiencia.flatMap((e) => [`${e.puesto} · ${e.organizacion} · ${e.lugar_y_modalidad} · ${e.fechas}`, ...e.puntos.map((p) => `  - ${p}`)]), '');
   if (cv.formacion.length) l.push('FORMACIÓN', ...cv.formacion.map((f) => `${f.titulo} · ${f.institucion} · ${f.estado_y_fechas}`), '');
   if (cv.habilidades.length) l.push('HABILIDADES', ...cv.habilidades.map((h) => `${h.categoria}: ${h.items.join(', ')}`), '');
   if (cv.idiomas.length) l.push('IDIOMAS', cv.idiomas.map((i) => `${i.idioma}: ${i.nivel}`).join(' | '));
@@ -218,6 +218,13 @@ function bloqueCopiable(titulo, texto, nota) {
     el('pre', { class: 'texto' }, texto));
 }
 
+const ROTULO = { titulo: 'Título sugerido', tecnologia: 'Tecnología sugerida', brecha: 'Brecha' };
+
+function textoPaginas(p) {
+  const base = p.medido ? `Ocupa ${p.cantidad} página(s), medido en un PDF real.` : `Ocupa unas ${p.cantidad} página(s) (estimación: no se pudo medir).`;
+  return `${base} Se abre y se edita en Word.`;
+}
+
 function mostrarResultado(r) {
   const a = r.analisis;
   const c = r.controles;
@@ -228,10 +235,10 @@ function mostrarResultado(r) {
       el('p', { class: 'titulo-cv' }, a.titulo_elegido.titulo),
       el('p', { class: 'nota' }, a.titulo_elegido.motivo),
       el('p', {}, el('a', { class: 'boton', href: `/api/trabajo/${datos.trabajo}/cv`, download: r.docx.nombre }, `Descargar ${r.docx.nombre}`)),
-      el('p', { class: 'nota' }, `Ocupa unas ${r.docx.paginasEstimadas} página(s) (estimación). Se abre y se edita en Word.`),
+      el('p', { class: 'nota' }, textoPaginas(r.paginas)),
       el('details', {}, el('summary', {}, 'Ver el texto del CV'), el('pre', { class: 'texto' }, cvATexto(r.cv)))),
     bloqueCopiable(`Carta (${r.palabrasCarta} palabras)`, r.cartaTexto),
-    bloqueCopiable('Preparate para una entrevista', r.guiaTexto, 'Las preguntas van en el idioma de la oferta; las notas, en español.'),
+    r.guiaTexto ? bloqueCopiable('Preparate para una entrevista', r.guiaTexto, 'Las preguntas van en el idioma de la oferta; las notas, en español.') : null,
     el('div', { class: 'bloque' },
       el('h3', {}, 'Análisis de la oferta'),
       el('p', { class: 'etiqueta' }, 'Requisitos'),
@@ -240,6 +247,7 @@ function mostrarResultado(r) {
         el('strong', {}, q.texto), ` (${q.tipo})`,
         el('div', { class: 'nota' }, q.justificacion))),
       el('p', { class: 'etiqueta' }, 'No cubierto'), lista(a.no_cubierto),
+      el('p', { class: 'etiqueta' }, 'Sugerencias (no se aplicaron al CV: decidís vos)'), lista(a.sugerencias.map((s) => `${ROTULO[s.tipo]}: ${s.sugerido}. ${s.motivo}${s.respaldo ? ` Respaldo: ${s.respaldo}` : ''}`)),
       el('p', { class: 'etiqueta' }, 'Alertas'), lista(a.alertas.map((x) => `${x.tipo}: ${x.detalle}`)),
       el('details', {},
         el('summary', {}, 'Qué priorizó y qué dejó afuera'),

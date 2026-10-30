@@ -1,11 +1,12 @@
 // Flujo completo de una postulación. No guarda nada: recibe textos y devuelve resultados en memoria.
 import { llamar, ErrorIA } from './ia.mjs';
-import { idiomasSchema, resultadoSchema, revisionSchema } from './esquema/index.mjs';
-import { pasoIdiomas, pasoGeneracion, pasoRevision } from './prompts.mjs';
+import { idiomasSchema, resultadoSchema, revisionSchema, acortarSchema, sinGuia } from './esquema/index.mjs';
+import { pasoIdiomas, pasoGeneracion, pasoRevision, pasoAcortar } from './prompts.mjs';
 import { validar } from './validacion/esquema.mjs';
 import { listaNegra, datosNuevos, textosConUbicacion } from './validacion/controles.mjs';
 import { leerContacto } from './lectura/contacto.mjs';
 import { generarCv, nombreDeArchivo } from './docx/generar.mjs';
+import { medirPaginas, evaluarPaginas } from './docx/paginas.mjs';
 
 // Llama a la IA y valida la respuesta. Si viene mal, un reintento diciéndole qué falló; si falla de nuevo, error claro.
 export async function llamarValidado({ prompt, esquema, llamarFn = llamar }) {
@@ -34,20 +35,21 @@ export const detectarIdiomas = ({ cv, oferta, llamarFn }) =>
 const formatearGuia = (guia) => guia.map((q, i) =>
   `${i + 1}. ${q.pregunta}\n   Por qué es probable: ${q.por_que_es_probable}\n   Con qué responder: ${q.con_que_responder}\n   Evitá: ${q.evitar}\n   Si no lo hiciste: ${q.si_no_lo_hiciste}`).join('\n\n');
 
-// Llamadas 2 y 3, controles con código y generación del .docx.
-export async function generarPostulacion({ cv, oferta, perfil, infoEmpresa = '', idiomaSalida, niveles, celular = '', empresa = '', llamarFn, alPaso = () => {} }) {
+// Llamadas 2 y 3, controles con código y generación del .docx. La guía de entrevista se arma solo si `conGuia` es true.
+// Si el CV no entra en una hoja (medido en un PDF real), se pide acortarlo, hasta 2 veces.
+export async function generarPostulacion({ cv, oferta, perfil, infoEmpresa = '', idiomaSalida, niveles, celular = '', empresa = '', conGuia = false, llamarFn, medirFn = medirPaginas, alPaso = () => {} }) {
   const contacto = leerContacto(perfil);
   if (!contacto.nombre) throw new ErrorIA('El perfil no tiene el nombre completo en la sección de contacto.', 'perfil');
   let costo = 0;
 
   alPaso('Analizando la oferta y escribiendo el CV, la carta y la guía…');
-  const generado = await llamarValidado({ prompt: await pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSalida, niveles }), esquema: resultadoSchema, llamarFn });
+  const generado = await llamarValidado({ prompt: await pasoGeneracion({ oferta, infoEmpresa, cv, perfil, idiomaSalida, niveles, conGuia }), esquema: conGuia ? resultadoSchema : sinGuia(resultadoSchema), llamarFn });
   costo += generado.costoEstimadoUsd;
   const resultado = generado.resultado;
 
   const revisar = async (borrador, nota = '') => {
-    const prompt = (await pasoRevision({ resultado: borrador, cv, perfil, oferta, infoEmpresa, idiomaSalida, niveles })) + nota;
-    const r = await llamarValidado({ prompt, esquema: revisionSchema, llamarFn });
+    const prompt = (await pasoRevision({ resultado: borrador, cv, perfil, oferta, infoEmpresa, idiomaSalida, niveles, conGuia })) + nota;
+    const r = await llamarValidado({ prompt, esquema: conGuia ? revisionSchema : sinGuia(revisionSchema), llamarFn });
     costo += r.costoEstimadoUsd;
     return r.resultado;
   };
@@ -64,23 +66,41 @@ export async function generarPostulacion({ cv, oferta, perfil, infoEmpresa = '',
     prohibidas = await listaNegra(textosFinales(revision), idiomaSalida);
   }
 
-  const nuevos = datosNuevos(textosFinales(revision), [cv, perfil, oferta, infoEmpresa], { contacto });
-  const docx = await generarCv({ cv: revision.cv, contacto, celular, idioma: idiomaSalida });
+  // Se arma el .docx, se mide en un PDF real y, si es largo, se acorta.
+  let cvFinal = revision.cv;
+  const armar = async () => {
+    const docx = await generarCv({ cv: cvFinal, contacto, celular, idioma: idiomaSalida });
+    return { docx, medida: await medirFn(docx.buffer) };
+  };
+  let { docx, medida } = await armar();
+  for (let i = 0; i < 2 && medida && evaluarPaginas(medida) === 'largo'; i++) {
+    alPaso('El CV no entra en una hoja: acortándolo…');
+    const r = await llamarValidado({ prompt: await pasoAcortar({ cv: cvFinal, medida }), esquema: acortarSchema, llamarFn });
+    costo += r.costoEstimadoUsd;
+    cvFinal = r.resultado.cv;
+    ({ docx, medida } = await armar());
+  }
+
+  const nuevos = datosNuevos(textosFinales({ ...revision, cv: cvFinal }), [cv, perfil, oferta, infoEmpresa], { contacto });
   const palabrasCarta = revision.carta.cuerpo.trim().split(/\s+/).length;
   const avisos = [];
-  if (docx.paginasEstimadas > 2) avisos.push(`El CV ocuparía unas ${docx.paginasEstimadas} páginas (estimación): conviene acortarlo a 2.`);
+  const estado = medida ? evaluarPaginas(medida) : null;
+  if (!medida) avisos.push(`No pude medir las páginas reales (hace falta Word o LibreOffice). Estimación: unas ${docx.paginasEstimadas}.`);
+  else if (estado === 'limite') avisos.push(`Caso límite: el CV ocupa 2 páginas, pero la segunda llena solo un ${Math.round(medida.ultima * 100)} %. Si podés, cortalo para que entre en una.`);
+  else if (estado === 'largo') avisos.push(`El CV ocupa ${medida.paginas} páginas (la última, llena en un ${Math.round(medida.ultima * 100)} %) y no se pudo acortar solo: recortalo a mano.`);
   if (palabrasCarta < 150 || palabrasCarta > 220) avisos.push(`La carta tiene ${palabrasCarta} palabras: el objetivo es de 150 a 220.`);
 
   return {
     analisis: resultado.analisis,
-    cv: revision.cv,
+    cv: cvFinal,
     carta: revision.carta,
     cartaTexto: `${revision.carta.saludo}\n\n${revision.carta.cuerpo}\n\n${revision.carta.firma}`,
-    guiaTexto: formatearGuia(revision.preparacion_entrevista),
+    guiaTexto: conGuia ? formatearGuia(revision.preparacion_entrevista) : '',
     cambios: revision.cambios,
     sinArreglar: revision.sin_arreglar,
     controles: { frasesProhibidas: prohibidas, datosNuevos: nuevos, avisos },
-    docx: { buffer: docx.buffer, nombre: nombreDeArchivo(contacto.nombre, empresa, idiomaSalida), paginasEstimadas: docx.paginasEstimadas },
+    docx: { buffer: docx.buffer, nombre: nombreDeArchivo(contacto.nombre, empresa, idiomaSalida) },
+    paginas: medida ? { cantidad: medida.paginas, ultima: medida.ultima, medido: true } : { cantidad: docx.paginasEstimadas, medido: false },
     palabrasCarta,
     costoEstimadoUsd: costo,
   };

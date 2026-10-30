@@ -44,6 +44,13 @@ const analisis = obj({
     orden: lista,
   }),
   no_cubierto: lista,
+  // Nota aparte: no se aplica sola al CV. Título o tecnología que la oferta pide, que el CV no dice textual pero la candidata puede sostener; o brecha si no puede.
+  sugerencias: arr(obj({
+    tipo: opciones('titulo', 'tecnologia', 'brecha'),
+    sugerido: texto,
+    motivo: texto,
+    respaldo: texto,
+  })),
   alertas: arr(obj({
     tipo: opciones('idioma', 'contradiccion', 'instruccion_oculta', 'anos_de_experiencia', 'falta_informacion', 'falta_metrica', 'titulo_ajustado', 'otra'),
     detalle: texto,
@@ -53,8 +60,8 @@ const analisis = obj({
 const cv = obj({
   titulo: texto,
   resumen: texto,
-  experiencia: arr(obj({ puesto: texto, organizacion: texto, lugar_y_modalidad: texto, fechas: texto, puntos: lista })),
   proyectos: arr(obj({ nombre: texto, encabezado: texto, fecha: texto, enlaces: lista, puntos: lista })),
+  experiencia: arr(obj({ puesto: texto, organizacion: texto, lugar_y_modalidad: texto, fechas: texto, puntos: lista })),
   formacion: arr(obj({ titulo: texto, institucion: texto, estado_y_fechas: texto })),
   habilidades: arr(obj({ categoria: texto, items: lista })),
   idiomas: arr(obj({ idioma: texto, nivel: texto })),
@@ -78,3 +85,12 @@ export const resultadoSchema = obj({ analisis, cv, carta, preparacion_entrevista
 
 // Llamada 3: revisión anti-IA.
 export const revisionSchema = obj({ cv, carta, preparacion_entrevista: entrevista, cambios: lista, sin_arreglar: lista });
+
+// Llamada para acortar el CV cuando no entra en una hoja.
+export const acortarSchema = obj({ cv });
+
+// La guía de entrevista es opcional: si no se pidió, el esquema no la incluye.
+export function sinGuia(esquema) {
+  const { preparacion_entrevista, ...propiedades } = esquema.properties;
+  return { ...esquema, properties: propiedades, required: esquema.required.filter((k) => k !== 'preparacion_entrevista') };
+}
