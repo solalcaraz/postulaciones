@@ -1,7 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { writeFile, rm, mkdtemp } from 'node:fs/promises';
+import { writeFile, rm, mkdtemp, readFile, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { crearServidor } from '../app/servidor.mjs';
@@ -21,7 +21,7 @@ before(async () => {
 after(() => rm(carpeta, { recursive: true, force: true }));
 
 async function conServidor(opciones, prueba) {
-  const app = crearServidor({ rutaPerfil, ejecutableClaude: 'programa-que-no-existe', medirFn: async () => ({ paginas: 1, ultima: 1 }), ...opciones });
+  const app = crearServidor({ carpetaDatos: carpeta, rutaPerfil, ejecutableClaude: 'programa-que-no-existe', medirFn: async () => ({ paginas: 1, ultima: 1 }), ...opciones });
   const puerto = await app.escuchar(0);
   const base = `http://127.0.0.1:${puerto}`;
   const pedir = async (ruta, { metodo = 'GET', cuerpo, cabeceras = {} } = {}) => {
@@ -174,3 +174,97 @@ test('la guía de entrevista llega solo si se la pidió', () => conServidor({ ll
   const con = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar({ guia: true }) })).json();
   assert.match((await esperar(pedir, con.id)).resultado.guiaTexto, /¿Qué hiciste\?/);
 }));
+
+// Carpeta de datos aparte, con perfil y, si se pide, CV maestro en español y en inglés (con un texto distinto en cada uno).
+async function carpetaConDatos({ maestros = false, medicion = null } = {}) {
+  const datos = await mkdtemp(join(tmpdir(), 'postulaciones-datos-'));
+  await writeFile(join(datos, 'perfil.md'), PERFIL, 'utf8');
+  if (maestros) {
+    await writeFile(join(datos, 'CV-maestro-ana-es.docx'), (await generarCv({ cv: CV_ES, contacto: { nombre: 'Ana Ejemplo' }, idioma: 'es' })).buffer);
+    const cvEn = { ...CV_ES, titulo: 'Marcador del CV en ingles' };
+    await writeFile(join(datos, 'CV-maestro-ana-en.docx'), (await generarCv({ cv: cvEn, contacto: { nombre: 'Ana Ejemplo' }, idioma: 'en' })).buffer);
+  }
+  if (medicion) await writeFile(join(datos, 'medicion.json'), JSON.stringify(medicion), 'utf8');
+  return datos;
+}
+
+function iaQueRecuerda() {
+  const base = iaPorEsquema();
+  const fn = async (pedido) => { fn.prompts.push(pedido.prompt); return base(pedido); };
+  fn.prompts = [];
+  return fn;
+}
+
+test('sin CV subido usa el CV maestro del idioma pedido; si se sube uno, manda el subido', async () => {
+  const datos = await carpetaConDatos({ maestros: true });
+  const ia = iaQueRecuerda();
+  try {
+    await conServidor({ llamarFn: ia, carpetaDatos: datos, rutaPerfil: join(datos, 'perfil.md') }, async ({ pedir }) => {
+      assert.deepEqual((await (await pedir('/api/estado')).json()).maestros, ['CV-maestro-ana-en.docx', 'CV-maestro-ana-es.docx']);
+      assert.equal((await pedir('/api/idiomas', { metodo: 'POST', cuerpo: { oferta: OFERTA_LARGA } })).estado, 200);
+
+      const { id } = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar({ archivo: undefined, idioma: 'en' }) })).json();
+      assert.equal((await esperar(pedir, id)).estado, 'listo');
+      assert.ok(ia.prompts.some((p) => p.includes('Marcador del CV en ingles')), 'con idioma en usa el maestro en inglés');
+
+      ia.prompts.length = 0;
+      const subido = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar({ idioma: 'en' }) })).json();
+      assert.equal((await esperar(pedir, subido.id)).estado, 'listo');
+      assert.ok(!ia.prompts.some((p) => p.includes('Marcador del CV en ingles')), 'el CV subido tiene prioridad');
+    });
+  } finally { await rm(datos, { recursive: true, force: true }); }
+});
+
+test('sin CV subido y sin maestro pide subir uno', () => conServidor({ llamarFn: iaPorEsquema() }, async ({ pedir }) => {
+  const r = await pedir('/api/idiomas', { metodo: 'POST', cuerpo: { oferta: OFERTA_LARGA } });
+  assert.equal(r.estado, 400);
+  assert.match((await r.json()).error, /Subí tu CV/);
+}));
+
+test('sin medicion.json no se guarda nada y no hay panel de medición', async () => {
+  const datos = await carpetaConDatos();
+  try {
+    await conServidor({ llamarFn: iaPorEsquema(), carpetaDatos: datos, rutaPerfil: join(datos, 'perfil.md') }, async ({ pedir }) => {
+      assert.equal((await (await pedir('/api/medicion')).json()).activa, false);
+      const { id } = await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar() })).json();
+      const t = await esperar(pedir, id);
+      assert.equal(t.estado, 'listo');
+      assert.equal(t.resultado.medicion, null);
+      assert.ok(!(await readdir(datos)).includes('mediciones'));
+    });
+  } finally { await rm(datos, { recursive: true, force: true }); }
+});
+
+test('modo medición: guarda hasta el objetivo, deja de guardar y permite anotar respuestas', async () => {
+  const datos = await carpetaConDatos({ medicion: { objetivo: 1 } });
+  try {
+    await conServidor({ llamarFn: iaPorEsquema(), carpetaDatos: datos, rutaPerfil: join(datos, 'perfil.md') }, async ({ pedir }) => {
+      const primera = await esperar(pedir, (await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar() })).json()).id);
+      assert.deepEqual(primera.resultado.medicion, { numero: 1, objetivo: 1 });
+      assert.deepEqual((await readdir(join(datos, 'mediciones', '001'))).sort(), ['CV-Ana-Ejemplo-Empresa-es.docx', 'carta.txt', 'oferta.txt', 'panel.md']);
+
+      const segunda = await esperar(pedir, (await (await pedir('/api/generar', { metodo: 'POST', cuerpo: cuerpoGenerar() })).json()).id);
+      assert.equal(segunda.resultado.medicion, null, 'al llegar al objetivo ya no guarda');
+
+      const m = await (await pedir('/api/medicion')).json();
+      assert.deepEqual([m.activa, m.guardando, m.hechas, m.objetivo], [true, false, 1, 1]);
+      assert.equal(m.entradas[0].respuesta, null);
+
+      const ok = await pedir('/api/medicion/001/respuesta', { metodo: 'POST', cuerpo: { valor: 'positiva' } });
+      assert.equal((await ok.json()).respuesta, 'positiva');
+      assert.equal(JSON.parse(await readFile(join(datos, 'mediciones', 'registro.json'), 'utf8'))[0].respuesta, 'positiva');
+      assert.equal((await pedir('/api/medicion/001/respuesta', { metodo: 'POST', cuerpo: { valor: 'quizas' } })).estado, 400);
+      assert.equal((await pedir('/api/medicion/009/respuesta', { metodo: 'POST', cuerpo: { valor: 'negativa' } })).estado, 400);
+      assert.equal((await (await pedir('/api/medicion/001/respuesta', { metodo: 'POST', cuerpo: { valor: null } })).json()).respuesta, null);
+    });
+  } finally { await rm(datos, { recursive: true, force: true }); }
+});
+
+test('una medición cerrada ya no muestra el panel', async () => {
+  const datos = await carpetaConDatos({ medicion: { objetivo: 5, cerrada: true } });
+  try {
+    await conServidor({ llamarFn: iaPorEsquema(), carpetaDatos: datos, rutaPerfil: join(datos, 'perfil.md') }, async ({ pedir }) => {
+      assert.equal((await (await pedir('/api/medicion')).json()).activa, false);
+    });
+  } finally { await rm(datos, { recursive: true, force: true }); }
+});

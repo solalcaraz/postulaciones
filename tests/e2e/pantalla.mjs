@@ -35,7 +35,7 @@ const iaDeEjemplo = async (pedido) => {
   if (respuesta.resultado.carta) respuesta.resultado.carta.cuerpo = CARTA_EJEMPLO;
   return respuesta;
 };
-const app = real ? crearServidor() : crearServidor({ llamarFn: iaDeEjemplo, rutaPerfil: join(temporal, 'perfil.md'), ejecutableClaude: process.execPath });
+const app = real ? crearServidor() : crearServidor({ llamarFn: iaDeEjemplo, carpetaDatos: temporal, rutaPerfil: join(temporal, 'perfil.md'), ejecutableClaude: process.execPath });
 const puerto = await app.escuchar(0);
 
 // Chrome sin ventana.

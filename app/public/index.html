@@ -22,9 +22,10 @@
       <h2 id="t-datos">1. Tus datos y la oferta</h2>
       <form id="formulario" novalidate>
         <div class="campo">
-          <label for="cv">Tu CV completo <span class="ayuda">(PDF o Word, hasta 8 MB)</span></label>
+          <label for="cv">Tu CV completo <span id="cv-ayuda" class="ayuda">(PDF o Word, hasta 8 MB)</span></label>
           <input id="cv" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
           <p id="cv-nombre" class="ayuda"></p>
+          <p id="cv-maestro" class="ayuda" hidden></p>
         </div>
 
         <div class="campo">
@@ -63,7 +64,7 @@
 
         <button id="continuar" class="boton" type="submit">Continuar</button>
       </form>
-      <p class="privacidad">No se guarda nada: tu CV y la oferta se procesan y se descartan. Para escribir los textos se envían a Claude, con la sesión de tu cuenta.</p>
+      <p id="privacidad" class="privacidad">No se guarda nada: tu CV y la oferta se procesan y se descartan. Para escribir los textos se envían a Claude, con la sesión de tu cuenta.</p>
     </section>
 
     <!-- Paso 2: niveles de idioma -->
@@ -99,6 +100,12 @@
       <h2 id="t-resultado">4. Tu postulación</h2>
       <div id="resultado"></div>
       <button id="nueva" class="boton boton-secundario" type="button">Nueva postulación</button>
+    </section>
+    <!-- Medición: solo se ve si está prendido el modo medición (docs/metricas.md) -->
+    <section id="medicion" aria-labelledby="t-medicion" hidden>
+      <h2 id="t-medicion">Medición</h2>
+      <p id="medicion-resumen" class="nota"></p>
+      <div id="medicion-lista"></div>
     </section>
   </main>
 

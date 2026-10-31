@@ -14,7 +14,7 @@ const el = (etiqueta, props = {}, ...hijos) => {
 
 const MAX_BYTES = 8 * 1024 * 1024;
 const NIVELES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'nativo'];
-const datos = { archivo: null, oferta: '', info: '', idiomaElegido: 'auto', empresa: '', celular: '', guia: false, idiomas: null, filas: [], trabajo: null };
+const datos = { maestro: false, archivo: null, oferta: '', info: '', idiomaElegido: 'auto', empresa: '', celular: '', guia: false, idiomas: null, filas: [], trabajo: null };
 let temporizador = null;
 
 /* ---------- utilidades ---------- */
@@ -67,7 +67,37 @@ async function verificarEstado() {
     if (!estado.claude.disponible) problemas.push('No encuentro Claude Code en esta compu. Instalalo y abrí una terminal con "claude" para iniciar sesión.');
     if (!estado.perfil) problemas.push('No encuentro tu perfil (datos-privados/perfil.md).');
     if (problemas.length) { $('estado').textContent = problemas.join(' '); $('estado').hidden = false; }
+    if (estado.maestros.length) {
+      datos.maestro = true;
+      $('cv-ayuda').textContent = '(opcional)';
+      $('cv-maestro').textContent = `Si no subís uno, uso tu CV maestro: ${estado.maestros.join(', ')}.`;
+      $('cv-maestro').hidden = false;
+    }
+    if (estado.medicion.activa) {
+      if (estado.medicion.guardando) $('privacidad').textContent = `Modo medición activo: esta postulación y sus resultados se guardan en datos-privados/mediciones (van ${estado.medicion.hechas} de ${estado.medicion.objetivo}). Para escribir los textos se envían a Claude, con la sesión de tu cuenta.`;
+      cargarMedicion();
+    }
   } catch { /* el formulario igual se puede completar */ }
+}
+
+/* ---------- medición: anotar si respondieron ---------- */
+async function cargarMedicion() {
+  const m = await api('/api/medicion');
+  $('medicion').hidden = !m.activa;
+  if (!m.activa) return;
+  $('medicion-resumen').textContent = `${m.hechas} de ${m.objetivo} postulaciones guardadas. ${m.guardando ? 'Sigo guardando las nuevas.' : 'Llegué al objetivo: ya no guardo postulaciones nuevas, pero podés seguir anotando respuestas.'}`;
+  const marcar = (entrada, valor, texto) => {
+    const casilla = el('input', { type: 'checkbox' });
+    casilla.checked = entrada.respuesta === valor;
+    casilla.addEventListener('change', async () => {
+      try { await api(`/api/medicion/${entrada.id}/respuesta`, { method: 'POST', body: JSON.stringify({ valor: casilla.checked ? valor : null }) }); } catch (error) { mostrarError(error.message); }
+      cargarMedicion();
+    });
+    return el('label', { class: 'casilla' }, casilla, ` ${texto}`);
+  };
+  $('medicion-lista').replaceChildren(...m.entradas.map((e) => el('div', { class: 'requisito' },
+    el('strong', {}, `#${e.id} `), `${e.titulo} · ${new Date(e.fecha).toLocaleDateString('es-AR')}`,
+    el('div', { class: 'fila' }, marcar(e, 'positiva', 'Respuesta positiva'), marcar(e, 'negativa', 'Respuesta negativa')))));
 }
 
 /* ---------- paso 1: datos ---------- */
@@ -85,9 +115,9 @@ $('formulario').addEventListener('submit', async (e) => {
   limpiarError();
   const archivo = $('cv').files[0];
   const oferta = $('oferta').value.trim();
-  if (!archivo) return mostrarError('Subí tu CV en PDF o Word.');
-  if (!/\.(pdf|docx)$/i.test(archivo.name)) return mostrarError('El CV tiene que ser un PDF o un archivo de Word (.docx).');
-  if (archivo.size > MAX_BYTES) return mostrarError('El archivo pesa más de 8 MB. Subí un CV más liviano.');
+  if (!archivo && !datos.maestro) return mostrarError('Subí tu CV en PDF o Word.');
+  if (archivo && !/\.(pdf|docx)$/i.test(archivo.name)) return mostrarError('El CV tiene que ser un PDF o un archivo de Word (.docx).');
+  if (archivo && archivo.size > MAX_BYTES) return mostrarError('El archivo pesa más de 8 MB. Subí un CV más liviano.');
   if (oferta.length < 80) return mostrarError('Pegá el texto completo de la oferta.');
   if ($('usar-celular').checked && !$('celular').value.trim()) return mostrarError('Escribí tu celular o destildá la casilla.');
 
@@ -95,7 +125,7 @@ $('formulario').addEventListener('submit', async (e) => {
   boton.disabled = true;
   boton.textContent = 'Leyendo tu CV…';
   try {
-    datos.archivo = { nombre: archivo.name, base64: await aBase64(archivo) };
+    datos.archivo = archivo ? { nombre: archivo.name, base64: await aBase64(archivo) } : null;
     Object.assign(datos, { oferta, info: $('info').value.trim(), idiomaElegido: $('idioma').value, empresa: $('empresa').value.trim(), celular: $('usar-celular').checked ? $('celular').value.trim() : '', guia: $('usar-guia').checked });
     datos.idiomas = await api('/api/idiomas', { method: 'POST', body: JSON.stringify({ archivo: datos.archivo, oferta }) });
     prepararNiveles();
@@ -241,6 +271,7 @@ function mostrarResultado(r) {
       el('p', { class: 'nota' }, a.titulo_elegido.motivo),
       el('p', {}, el('a', { class: 'boton', href: `/api/trabajo/${datos.trabajo}/cv`, download: r.docx.nombre }, `Descargar ${r.docx.nombre}`)),
       el('p', { class: 'nota' }, textoPaginas(r.paginas)),
+      r.medicion ? el('p', { class: 'nota' }, `Guardada en la medición: ${r.medicion.numero} de ${r.medicion.objetivo}.`) : null,
       el('details', {}, el('summary', {}, 'Ver el texto del CV'), el('pre', { class: 'texto' }, cvATexto(r.cv)))),
     bloqueCopiable(`Carta (${r.palabrasCarta} palabras)`, r.cartaTexto),
     r.guiaTexto ? bloqueCopiable('Preparate para una entrevista', r.guiaTexto, 'Las preguntas van en el idioma de la oferta; las notas, en español.') : null,

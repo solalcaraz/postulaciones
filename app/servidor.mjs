@@ -9,6 +9,8 @@ import { spawn } from 'node:child_process';
 import { leerArchivo, ErrorArchivo } from '../src/lectura/archivo.mjs';
 import { detectarIdiomas, generarPostulacion } from '../src/postular.mjs';
 import { ErrorIA } from '../src/ia.mjs';
+import { leerMaestro, listarMaestros } from '../src/lectura/maestro.mjs';
+import { estadoMedicion, guardarPostulacion, anotarRespuesta } from '../src/medicion.mjs';
 
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
 const PUBLICO = join(RAIZ, 'app', 'public');
@@ -43,9 +45,12 @@ function leerCuerpo(req) {
   });
 }
 
-async function textoDelCv(archivo) {
-  if (!archivo?.nombre || typeof archivo.base64 !== 'string') throw new ErrorPedido('Subí tu CV en PDF o Word.');
-  return leerArchivo(Buffer.from(archivo.base64, 'base64'), archivo.nombre);
+// Si se sube un CV, manda ese. Si no, se usa el CV maestro de datos-privados.
+async function textoDelCv(archivo, carpetaDatos, idioma) {
+  if (archivo?.nombre && typeof archivo.base64 === 'string') return leerArchivo(Buffer.from(archivo.base64, 'base64'), archivo.nombre);
+  const maestro = await leerMaestro(carpetaDatos, idioma);
+  if (!maestro) throw new ErrorPedido('Subí tu CV en PDF o Word.');
+  return maestro;
 }
 
 function validarOferta(oferta) {
@@ -72,7 +77,7 @@ function verificarClaude(ejecutable) {
   });
 }
 
-export function crearServidor({ llamarFn, medirFn, rutaPerfil = join(RAIZ, 'datos-privados', 'perfil.md'), ejecutableClaude = process.env.POSTULA_CLAUDE || 'claude' } = {}) {
+export function crearServidor({ llamarFn, medirFn, carpetaDatos = join(RAIZ, 'datos-privados'), rutaPerfil = join(carpetaDatos, 'perfil.md'), ejecutableClaude = process.env.POSTULA_CLAUDE || 'claude' } = {}) {
   const trabajos = new Map();
   let puerto = 0;
 
@@ -82,7 +87,7 @@ export function crearServidor({ llamarFn, medirFn, rutaPerfil = join(RAIZ, 'dato
 
   async function rutaIdiomas(req) {
     const { archivo, oferta } = await leerCuerpo(req);
-    const cv = await textoDelCv(archivo);
+    const cv = await textoDelCv(archivo, carpetaDatos, 'es');
     const { resultado } = await detectarIdiomas({ cv, oferta: validarOferta(oferta), llamarFn });
     return resultado;
   }
@@ -90,9 +95,9 @@ export function crearServidor({ llamarFn, medirFn, rutaPerfil = join(RAIZ, 'dato
   async function rutaGenerar(req) {
     if ([...trabajos.values()].some((t) => t.estado === 'en curso')) throw new ErrorPedido('Ya hay una postulación en curso. Esperá a que termine.', 409);
     const { archivo, oferta, infoEmpresa, idioma, niveles, celular, empresa, guia } = await leerCuerpo(req);
-    const cv = await textoDelCv(archivo);
     const textoOferta = validarOferta(oferta);
     if (!['es', 'en'].includes(idioma)) throw new ErrorPedido('Elegí el idioma del CV: español o inglés.');
+    const cv = await textoDelCv(archivo, carpetaDatos, idioma);
     if (!niveles || !NIVELES_VALIDOS.includes(niveles[idioma])) throw new ErrorPedido('Confirmá el nivel del idioma en el que se escribe el CV.');
     for (const [nombre, nivel] of Object.entries(niveles)) {
       if (!NIVELES_VALIDOS.includes(nivel)) throw new ErrorPedido(`El nivel de ${nombre} no es válido.`);
@@ -108,11 +113,16 @@ export function crearServidor({ llamarFn, medirFn, rutaPerfil = join(RAIZ, 'dato
       cv, oferta: textoOferta, perfil, infoEmpresa: String(infoEmpresa || ''), idiomaSalida: idioma, niveles,
       celular: String(celular || '').slice(0, 40), empresa: String(empresa || '').slice(0, 60), conGuia: guia === true, llamarFn, medirFn,
       alPaso: (m) => { trabajo.mensaje = m; },
-    }).then((r) => {
+    }).then(async (r) => {
       const { docx, ...resto } = r;
-      trabajo.estado = 'listo';
       trabajo.resultado = { ...resto, docx: { nombre: docx.nombre } };
       trabajo.buffer = docx.buffer;
+      try {
+        trabajo.resultado.medicion = await guardarPostulacion(carpetaDatos, { resultado: r, oferta: textoOferta, segundos: Math.round((Date.now() - trabajo.inicio) / 1000) });
+      } catch {
+        trabajo.resultado.controles.avisos.push('No pude guardar esta postulación en la medición.');
+      }
+      trabajo.estado = 'listo';
     }).catch((e) => {
       trabajo.estado = 'error';
       trabajo.error = mensajeDeError(e).mensaje;
@@ -131,7 +141,14 @@ export function crearServidor({ llamarFn, medirFn, rutaPerfil = join(RAIZ, 'dato
       if (req.method === 'GET' && url.pathname === '/api/estado') {
         let perfilOk = true;
         try { await readFile(rutaPerfil, 'utf8'); } catch { perfilOk = false; }
-        return enviarJson(res, 200, { claude: await verificarClaude(ejecutableClaude), perfil: perfilOk });
+        const { activa, guardando, objetivo, hechas } = await estadoMedicion(carpetaDatos);
+        return enviarJson(res, 200, { claude: await verificarClaude(ejecutableClaude), perfil: perfilOk, maestros: await listarMaestros(carpetaDatos), medicion: { activa, guardando, objetivo, hechas } });
+      }
+      if (req.method === 'GET' && url.pathname === '/api/medicion') return enviarJson(res, 200, await estadoMedicion(carpetaDatos));
+      const respuesta = url.pathname.match(/^\/api\/medicion\/(\d{3,})\/respuesta$/);
+      if (req.method === 'POST' && respuesta) {
+        const { valor } = await leerCuerpo(req);
+        try { return enviarJson(res, 200, await anotarRespuesta(carpetaDatos, respuesta[1], valor ?? null)); } catch (e) { throw new ErrorPedido(e.message); }
       }
       if (req.method === 'POST' && url.pathname === '/api/idiomas') return enviarJson(res, 200, await rutaIdiomas(req));
       if (req.method === 'POST' && url.pathname === '/api/generar') return enviarJson(res, 202, await rutaGenerar(req));
