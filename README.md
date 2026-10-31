@@ -18,9 +18,9 @@ La herramienta ataca eso con reglas escritas en los prompts y con controles hech
 
 ![Flujo completo: formulario, confirmación de niveles de idioma, progreso y resultado](docs/demo/flujo.gif)
 
-Es una corrida real, con Claude, mi CV maestro y una oferta de desarrollador de software back-end. Difuminé mi ubicación, mi email y el nombre de la empresa (en el cuadro de la oferta lo reemplacé por `[empresa]`, porque un cuadro de texto no se puede difuminar a medias). La demo muestra el CV y la carta. El análisis de la oferta y las sugerencias que devuelve el sistema quedan fuera de las imágenes.
+Es una corrida real, con Claude, mi CV maestro y una oferta de desarrollador de software back-end. Difuminé mi ubicación, mi email y el nombre de la empresa. El GIF recorre el flujo completo, con el análisis de la oferta, las sugerencias y las alertas que devuelve el sistema.
 
-En esta corrida el CV ocupó una página y un 4 % de la segunda. La herramienta lo marca como caso límite, y lo dejé así. Las capturas están en [docs/demo](docs/demo) (el CV en [cv-generado.png](docs/demo/cv-generado.png)) y salen de `npm run pantalla`; con `PANTALLA_REAL=1` usa Claude de verdad (los detalles están al principio de [tests/e2e/pantalla.mjs](tests/e2e/pantalla.mjs)).
+En esta corrida el CV ocupó una página y un 4 % de la segunda. La herramienta lo marca como caso límite, y lo dejé así. El resultado completo está en [resultado.png](docs/demo/resultado.png) y el CV en [cv-generado.png](docs/demo/cv-generado.png) y salen de `npm run pantalla`; con `PANTALLA_REAL=1` usa Claude de verdad (los detalles están al principio de [tests/e2e/pantalla.mjs](tests/e2e/pantalla.mjs)).
 
 No hay demo online: la herramienta usa la sesión de Claude Code de mi compu, así que no tiene sentido publicarla en un hosting.
 
@@ -48,17 +48,17 @@ El contenido sale solo de dos fuentes: el CV que subo y un archivo local, `datos
 Las decisiones que tomé y por qué:
 
 - **Claude Code en vez de la API.** Primero había elegido la API de Anthropic. La cambié porque ya usaba Claude Code en otro proyecto mío: así no manejo claves ni pago aparte, y el uso sale del cupo de mi plan. El costo es que depende de tener la sesión iniciada en esa compu.
-- **Las instrucciones van por entrada estándar.** La llamada de generación arma unos 60.000 caracteres con mi perfil y el límite de la línea de comandos de Windows es de unos 32.000.
-- **Tres llamadas y no dos.** Probé fundir la revisión en la llamada grande: en una prueba bajó de unos 0,50 a unos 0,40 USD estimados, y de 2,7 a 2,6 minutos. Pero la lista de cambios de la revisión dejaba de reflejar correcciones reales, y esa lista es lo que me deja auditar qué tocó la IA. Dejé tres.
-- **Validación doble.** Claude Code recibe el esquema de la respuesta, y yo la vuelvo a validar con `ajv`. Si viene mal, un reintento diciéndole qué falló, y si falla otra vez, un mensaje claro. Usé `ajv` y no `zod` porque los esquemas ya están en JSON Schema y con `zod` tendría que escribirlos dos veces.
-- **Controles con código, sin IA.** Una lista negra de frases prohibidas (con un reintento si queda alguna) y un control de datos nuevos: todo número, enlace o término técnico del texto final tiene que estar en el CV, el perfil o la oferta. Si no, el panel me lo marca. No reemplazan las reglas de los prompts; son una segunda red.
+- **Las instrucciones van por entrada estándar.** Windows limita la línea de comandos a unos 32.000 caracteres y cada llamada es más larga.
+- **Tres llamadas y no dos.** Probé fundir la revisión en la llamada grande: ahorraba unos 0,10 USD estimados, pero la lista de cambios dejaba de reflejar correcciones reales, y esa lista es lo que me deja auditar qué tocó la IA.
+- **Validación doble.** Claude Code recibe el esquema de la respuesta, y yo la vuelvo a validar con `ajv`. Si viene mal, un reintento y después un mensaje claro.
+- **Controles con código, sin IA.** Una lista negra de frases prohibidas y un control de datos nuevos: todo número, enlace o término técnico del texto final tiene que estar en el CV, el perfil o la oferta. Si no, el panel me lo marca.
 - **El nivel de idioma lo confirmo yo.** Antes de generar, la pantalla me pide el nivel de cada idioma. El texto se escribe a ese nivel y nunca más alto. Si la oferta pide más, va al panel como "no cubierto".
 - **Lo que falta no va a la carta.** Los requisitos sin cubrir aparecen en el panel, que es privado, y la carta no los menciona. Las sugerencias del panel (un título o una tecnología que podría sostener) tampoco se aplican solas al CV.
-- **Páginas medidas, no estimadas.** Estimar por caracteres es aproximado. Convierto el .docx a PDF y miro cuánto llena la última página. Admito una segunda hoja solo si lleva un cuarto de página o menos, y el panel lo avisa como caso límite. Sin Word ni LibreOffice, estima y lo avisa.
-- **Servidor propio y mínimo, sin framework.** Escucha solo en `127.0.0.1`, pide una cabecera propia en los POST y revisa el `Host`, para que una página ajena no le hable. El trabajo vive en memoria y se borra a los 30 minutos. La pantalla muestra todo como texto, nunca como HTML, porque el contenido viene de una IA.
+- **Páginas medidas, no estimadas.** Convierto el .docx a PDF y miro cuánto llena la última página. Admito una segunda hoja solo si lleva un cuarto de página o menos, y el panel lo avisa como caso límite.
+- **Servidor propio y mínimo, sin framework.** Escucha solo en mi compu y la pantalla muestra todo como texto, nunca como HTML, porque el contenido viene de una IA.
 - **La oferta y el CV son datos, no órdenes.** Si traen instrucciones para la IA, se ignoran y el panel lo avisa.
 - **No se guarda nada**, salvo en el modo medición que prendo a mano durante un tiempo para juntar métricas (ver [docs/metricas.md](docs/metricas.md)). Ni el CV, ni la oferta, ni los resultados.
-- **Privacidad.** Para escribir los textos, el CV, el perfil y la oferta se envían a Anthropic a través de Claude Code, con mi sesión. En planes de consumo esas conversaciones pueden usarse para entrenar modelos si está activado el ajuste de mejora del modelo en claude.ai: conviene revisarlo y apagarlo antes de usar la herramienta.
+- **Privacidad.** Para escribir los textos, el CV, el perfil y la oferta se envían a Anthropic a través de Claude Code, con mi sesión.
 
 ## Cómo correrlo
 
@@ -88,6 +88,5 @@ Estos archivos son míos y tendrían que cambiarse para usarla con otros datos: 
 
 - **Medir con uso real.** Es lo principal que falta. El plan está en [docs/metricas.md](docs/metricas.md).
 - **Probarla con una oferta real en inglés.** Las pruebas en inglés usaron ofertas inventadas.
-- **Funcionar fuera de Windows.** Hoy el lanzador es un `.cmd` y la medición de páginas con Word usa PowerShell.
 - **Afinar el control de datos nuevos.** No revisa nombres propios comunes y puede marcar traducciones como si fueran datos nuevos (por ejemplo, "ATMs" por "cajeros").
 - **Automatizar la auditoría.** Hoy la revisión de restricciones (`pruebas/verificador.md`) la hago a mano; los controles automáticos cubren solo una parte.

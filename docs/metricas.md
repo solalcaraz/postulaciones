@@ -1,33 +1,33 @@
 # Plan de métricas
 
-**Estado: sin datos todavía.** Esta página es el espacio para completar con resultados reales. Todo lo que está en blanco es porque todavía no se midió.
+**Estado: midiendo desde el 31/10/2026, con un objetivo de 30 postulaciones.** Acá completo los resultados reales. Lo que está en blanco todavía no lo medí.
 
-## Qué se quiere saber
-1. **¿Funciona?** Si el CV entra en una página, si la carta cumple las reglas y cuánto hay que corregir a mano.
+## Qué quiero saber
+1. **¿Funciona?** Si el CV entra en una página, si la carta cumple las reglas y cuánto tengo que corregir a mano.
 2. **¿Cuánto cuesta?** Tiempo de generación y costo estimado por postulación.
 3. **¿Sirve?** Si las postulaciones hechas con la herramienta reciben respuesta, entrevistas o contactos.
 
 ## Cuántas postulaciones hacen falta
-No hay un número mágico. Mi criterio, para que lo definamos juntas:
-- **Para lo técnico (preguntas 1 y 2): 10 postulaciones** alcanzan para ver valores típicos y cuánto varían. Son datos que sacás de la propia herramienta.
-- **Para lo que pasa afuera (pregunta 3): 30 postulaciones o más.** La respuesta de las empresas es poco frecuente, así que con pocas postulaciones el resultado es puro azar. Ejemplo: si 3 de 30 responden (10 %), el valor real podría estar entre 3 % y 26 % con un 95 % de confianza. Con 10 postulaciones, entre 1 de 10 y 3 de 10 no se pueden distinguir.
-- **Tiempo:** dejar pasar al menos 2 semanas después de la última postulación antes de cerrar el conteo, porque las respuestas llegan tarde.
-- **Comparación:** para saber si la herramienta mejora algo, hace falta un punto de partida. Si tenés registro de postulaciones anteriores (cuántas enviaste y cuántas tuvieron respuesta), cargalo abajo. Si no, los resultados se pueden contar pero no comparar.
+No hay un número mágico. Mi criterio:
+- **Para lo técnico (preguntas 1 y 2): 10 postulaciones** alcanzan para ver valores típicos y cuánto varían. Son datos que salen de la propia herramienta.
+- **Para lo que pasa afuera (pregunta 3): 30 postulaciones o más.** Las empresas responden poco, así que con pocas postulaciones el resultado es puro azar. Ejemplo: si 3 de 30 responden (10 %), el valor real podría estar entre 3 % y 26 % con un 95 % de confianza. Con 10 postulaciones, entre 1 de 10 y 3 de 10 no se pueden distinguir.
+- **Tiempo:** dejo pasar al menos 2 semanas después de la última postulación antes de cerrar el conteo, porque las respuestas llegan tarde.
+- **Comparación:** para saber si la herramienta mejora algo necesito un punto de partida. Si tengo registro de postulaciones anteriores (cuántas envié y cuántas tuvieron respuesta), lo cargo abajo. Si no, los resultados se pueden contar pero no comparar.
 
 **Número elegido: 30 postulaciones.** Ventana: desde el 31/10/2026 hasta ____.
 
 ## Checklist
 **Antes de empezar**
-- [x] Definir el número de postulaciones y la fecha de inicio (arriba). Falta la fecha de cierre.
+- [x] Definir el número de postulaciones y la fecha de inicio. Falta la fecha de cierre.
 - [ ] Cargar el punto de partida: postulaciones anteriores sin la herramienta y sus respuestas, si existen.
-- [x] Prender el modo medición (ver "Cómo se guarda" más abajo) con el número elegido.
+- [x] Prender el modo medición (ver "Cómo se guarda") con el número elegido.
 - [ ] Definir qué cuenta como "respuesta" y qué como "contacto" (por ejemplo: mail de la empresa, mensaje por LinkedIn, llamado, pedido de entrevista).
 - [ ] Revisar que el ajuste de mejora del modelo en claude.ai esté apagado.
 
 **Durante**
 - [ ] Hacer cada postulación con la herramienta y anotar una fila en el registro.
-- [ ] Anotar cuánto editaste a mano antes de enviar: nada, poco (frases sueltas) o mucho (reescribiste partes).
-- [ ] Anotar la fecha de envío y, cuando llegue, la fecha y el tipo de respuesta. En la pantalla, el panel "Medición" permite tildar si la respuesta fue positiva o negativa. Las que no respondan quedan como "sin respuesta" recién al cerrar.
+- [ ] Anotar cuánto edité a mano antes de enviar: nada, poco (frases sueltas) o mucho (reescribí partes).
+- [ ] Anotar la fecha de envío y, cuando llegue, la fecha y el tipo de respuesta. En la pantalla, el panel "Medición" me deja tildar si la respuesta fue positiva o negativa. Las que no respondan quedan como "sin respuesta" recién al cerrar.
 - [ ] Anotar cualquier error, mensaje de límite de uso o resultado raro, con la fecha.
 - [ ] Una vez por semana, revisar que el conteo avance.
 
@@ -35,7 +35,7 @@ No hay un número mágico. Mi criterio, para que lo definamos juntas:
 - [ ] Esperar 2 semanas desde la última postulación.
 - [ ] Marcar "sin respuesta" en las que no contestaron.
 - [ ] Completar la tabla de resultados finales.
-- [ ] Cerrar la medición (`"cerrada": true` en `datos-privados/medicion.json`) y borrar lo guardado que no vaya a conservarse.
+- [ ] Cerrar la medición (`"cerrada": true` en `datos-privados/medicion.json`) y borrar lo guardado que no vaya a conservar.
 - [ ] Pasar los resultados al README, en "Qué aprendí y qué mejoraría".
 
 ## Resultados finales
@@ -57,47 +57,47 @@ No hay un número mágico. Mi criterio, para que lo definamos juntas:
 Un dato previo, de un solo caso y sin valor estadístico: en una prueba del 12/10/2026 con una oferta real, las 3 llamadas tardaron unos 2,7 minutos y costaron unos 0,50 USD estimados a precios de API (el uso real sale del plan de suscripción).
 
 ## Registro por postulación
-Copiá una fila por postulación. Las columnas de generación salen del panel y del resultado; las de respuesta las anotás vos.
+Una fila por postulación. Las columnas de generación las copio de `datos-privados/mediciones/registro.json` después de cada postulación (o todas juntas al cerrar), y las de respuesta las voy completando a medida que llegan. Anoto el puesto y no la empresa, porque este archivo es público.
 
-| # | Fecha | Empresa y puesto | Idioma | Min. de generación | Costo estimado (USD) | Páginas del CV | Palabras de la carta | Frases prohibidas | Datos nuevos marcados | Cuánto edité a mano | ¿La envié? (fecha) | Respuesta (fecha y tipo) |
+| # | Fecha | Puesto | Idioma | Min. de generación | Costo estimado (USD) | Páginas del CV | Palabras de la carta | Frases prohibidas | Datos nuevos marcados | Cuánto edité a mano | ¿La envié? (fecha) | Respuesta (fecha y tipo) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | | | | | | | | | | | | |
-| 2 | | | | | | | | | | | | |
-| 3 | | | | | | | | | | | | |
-| 4 | | | | | | | | | | | | |
-| 5 | | | | | | | | | | | | |
-| 6 | | | | | | | | | | | | |
-| 7 | | | | | | | | | | | | |
-| 8 | | | | | | | | | | | | |
-| 9 | | | | | | | | | | | | |
-| 10 | | | | | | | | | | | | |
-| 11 | | | | | | | | | | | | |
-| 12 | | | | | | | | | | | | |
-| 13 | | | | | | | | | | | | |
-| 14 | | | | | | | | | | | | |
-| 15 | | | | | | | | | | | | |
-| 16 | | | | | | | | | | | | |
-| 17 | | | | | | | | | | | | |
-| 18 | | | | | | | | | | | | |
-| 19 | | | | | | | | | | | | |
-| 20 | | | | | | | | | | | | |
-| 21 | | | | | | | | | | | | |
-| 22 | | | | | | | | | | | | |
-| 23 | | | | | | | | | | | | |
-| 24 | | | | | | | | | | | | |
-| 25 | | | | | | | | | | | | |
-| 26 | | | | | | | | | | | | |
-| 27 | | | | | | | | | | | | |
-| 28 | | | | | | | | | | | | |
-| 29 | | | | | | | | | | | | |
-| 30 | | | | | | | | | | | | |
+| 1 | 31/10/2026 | Desarrollador de software (back-end) | es | 1,9 | 0,36 | 2 (la segunda al 4 %) | 206 | 0 | 0 |  |  |  |
+| 2 | 31/10/2026 | Software Engineer Backend | es | 2,0 | 0,48 | 2 (la segunda al 4 %) | 197 | 0 | 0 |  |  |  |
+| 3 | 31/10/2026 | Fullstack React Java | es | 2,0 | 0,44 | 2 (la segunda al 19 %) | 245 | 0 | 0 |  |  |  |
+| 4 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 5 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 6 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 7 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 8 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 9 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 10 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 11 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 12 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 13 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 14 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 15 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 16 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 17 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 18 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 19 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 20 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 21 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 22 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 23 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 24 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 25 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 26 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 27 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 28 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 29 |  |  |  |  |  |  |  |  |  |  |  |  |
+| 30 |  |  |  |  |  |  |  |  |  |  |  |  |
 
 ## Cómo se guarda
 Por defecto la herramienta **no guarda nada**. El modo medición es la única excepción, y es temporal:
 
 1. **Prenderlo:** crear el archivo `datos-privados/medicion.json` con el número elegido, por ejemplo `{"objetivo": 30}`.
-2. **Mientras guarda:** cada postulación deja una carpeta en `datos-privados/mediciones/` (por ejemplo `001/`) con el CV, la carta, el panel de análisis y la oferta, más una fila en `registro.json` (fecha, minutos, costo estimado, páginas, palabras de la carta, avisos de los controles y la respuesta). La pantalla avisa que el modo está activo y en qué número va.
+2. **Mientras guarda:** cada postulación deja una carpeta en `datos-privados/mediciones/` (por ejemplo `001/`) con el CV, la carta, el panel de análisis y la oferta, más una entrada en `registro.json` (fecha, minutos, costo estimado, páginas, palabras de la carta, avisos de los controles y la respuesta). La pantalla avisa que el modo está activo y en qué número va.
 3. **Al llegar al objetivo:** deja de guardar postulaciones nuevas. El panel "Medición" de la pantalla sigue, para tildar si la respuesta fue positiva o negativa en cada postulación.
 4. **Cerrar:** poner `"cerrada": true` en `medicion.json` (o borrar el archivo). El panel desaparece y la herramienta vuelve a no guardar nada.
 
-Esa carpeta tiene datos personales, la ignora git y no se sube a ningún lado. El registro tiene los datos técnicos; lo que pasa afuera (fecha de envío, tipo de respuesta) se completa a mano en las tablas de arriba.
+Esa carpeta tiene datos personales, git la ignora y no se sube a ningún lado. El registro tiene los datos técnicos; lo que pasa afuera (fecha de envío, tipo de respuesta) lo completo a mano en las tablas de arriba.
