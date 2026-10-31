@@ -71,8 +71,6 @@ npm install
 2. Ejecutá `npm start`, o hacé doble clic en `Abrir Postulaciones.cmd`.
 3. Abrí `http://127.0.0.1:4400`, subí tu CV, pegá la oferta y seguí los pasos. La ventana de la terminal tiene que quedar abierta.
 
-Para usar otro modelo, en PowerShell: `$env:POSTULA_MODELO = "opus"; npm start`. Por defecto usa `sonnet`.
-
 También se puede correr sin pantalla:
 
 ```bash
@@ -92,6 +90,7 @@ npm run pantalla   # necesita Chrome; deja capturas de cada paso en datos-privad
 
 - Pedirle a la IA que no invente no alcanza. Lo que me dio confianza fueron los controles en código que revisan el resultado, y una fuente de verdad clara: el CV y el perfil.
 - Cambié dos decisiones sobre la marcha. Empecé con Next.js y la API, y terminé con un servidor de Node sin framework y Claude Code. Con un programa de este tamaño, menos dependencias me dejó entender y auditar todo el código.
+- Aprendí a aplicar skills y a estructurar un `CLAUDE.md` para trabajar con IA. Lo que mejor funcionó fue pensar las decisiones primero, escribir un buen prompt y recién después pedir el código, con buenas herramientas de asistencia.
 - Los prompts también son código: viven en archivos propios, versionados, y cambiar una palabra cambia el resultado. Por eso los ajusté probándolos con ofertas de ejemplo, y los cambios quedan en el historial de git.
 
 **Qué mejoraría**
