@@ -180,6 +180,7 @@ ul.lista li { margin: var(--e2) 0; }
 .etiqueta { margin: var(--e5) 0 var(--e1); font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--suave); }
 
 .requisito { margin: 0 0 var(--e4); }
+.requisito label.campo { display: grid; gap: var(--e1); font-weight: 500; }
 .puntaje {
   display: inline-block;
   margin-right: var(--e2);

@@ -250,12 +250,21 @@ test('modo medición: guarda hasta el objetivo, deja de guardar y permite anotar
       assert.deepEqual([m.activa, m.guardando, m.hechas, m.objetivo], [true, false, 1, 1]);
       assert.equal(m.entradas[0].respuesta, null);
 
-      const ok = await pedir('/api/medicion/001/respuesta', { metodo: 'POST', cuerpo: { valor: 'positiva' } });
-      assert.equal((await ok.json()).respuesta, 'positiva');
-      assert.equal(JSON.parse(await readFile(join(datos, 'mediciones', 'registro.json'), 'utf8'))[0].respuesta, 'positiva');
-      assert.equal((await pedir('/api/medicion/001/respuesta', { metodo: 'POST', cuerpo: { valor: 'quizas' } })).estado, 400);
-      assert.equal((await pedir('/api/medicion/009/respuesta', { metodo: 'POST', cuerpo: { valor: 'negativa' } })).estado, 400);
-      assert.equal((await (await pedir('/api/medicion/001/respuesta', { metodo: 'POST', cuerpo: { valor: null } })).json()).respuesta, null);
+      const anotar = (id, cuerpo) => pedir(`/api/medicion/${id}`, { metodo: 'POST', cuerpo });
+      const registro = async () => JSON.parse(await readFile(join(datos, 'mediciones', 'registro.json'), 'utf8'))[0];
+      assert.deepEqual([m.entradas[0].puesto, m.entradas[0].idioma, m.entradas[0].sugerencias, m.entradas[0].aplicadas, m.entradas[0].enviada], [OFERTA_LARGA.split('\n')[0].slice(0, 80), 'es', 1, null, null]);
+
+      assert.equal((await (await anotar('001', { respuesta: 'positiva' })).json()).respuesta, 'positiva');
+      assert.equal((await registro()).respuesta, 'positiva');
+      assert.equal((await anotar('001', { respuesta: 'quizas' })).estado, 400);
+      assert.equal((await anotar('009', { respuesta: 'negativa' })).estado, 400);
+
+      const completa = await (await anotar('001', { enviada: '2026-11-02', aplicadas: 1 })).json();
+      assert.deepEqual([completa.enviada, completa.aplicadas, completa.respuesta], ['2026-11-02', 1, 'positiva'], 'solo cambia lo que viene en el pedido');
+      assert.equal((await anotar('001', { aplicadas: 2 })).estado, 400, 'no puede haber más aplicadas que sugerencias');
+      assert.equal((await anotar('001', { aplicadas: 1.5 })).estado, 400);
+      assert.equal((await anotar('001', { enviada: '2 de noviembre' })).estado, 400);
+      assert.equal((await (await anotar('001', { respuesta: null, enviada: null, aplicadas: null })).json()).respuesta, null);
     });
   } finally { await rm(datos, { recursive: true, force: true }); }
 });

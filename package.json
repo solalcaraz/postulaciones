@@ -8,6 +8,7 @@
     "start": "node app/iniciar.mjs",
     "postular": "node scripts/postular.mjs",
     "test": "node --test tests/*.test.mjs",
+    "medicion": "node scripts/medicion.mjs",
     "pantalla": "node tests/e2e/pantalla.mjs"
   },
   "dependencies": {

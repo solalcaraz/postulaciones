@@ -86,18 +86,31 @@ async function cargarMedicion() {
   $('medicion').hidden = !m.activa;
   if (!m.activa) return;
   $('medicion-resumen').textContent = `${m.hechas} de ${m.objetivo} postulaciones guardadas. ${m.guardando ? 'Sigo guardando las nuevas.' : 'Llegué al objetivo: ya no guardo postulaciones nuevas, pero podés seguir anotando respuestas.'}`;
+  const guardar = async (entrada, cambios) => {
+    try { await api(`/api/medicion/${entrada.id}`, { method: 'POST', body: JSON.stringify(cambios) }); } catch (error) { mostrarError(error.message); }
+    cargarMedicion();
+  };
   const marcar = (entrada, valor, texto) => {
     const casilla = el('input', { type: 'checkbox' });
     casilla.checked = entrada.respuesta === valor;
-    casilla.addEventListener('change', async () => {
-      try { await api(`/api/medicion/${entrada.id}/respuesta`, { method: 'POST', body: JSON.stringify({ valor: casilla.checked ? valor : null }) }); } catch (error) { mostrarError(error.message); }
-      cargarMedicion();
-    });
+    casilla.addEventListener('change', () => guardar(entrada, { respuesta: casilla.checked ? valor : null }));
     return el('label', { class: 'casilla' }, casilla, ` ${texto}`);
   };
-  $('medicion-lista').replaceChildren(...m.entradas.map((e) => el('div', { class: 'requisito' },
-    el('strong', {}, `#${e.id} `), `${e.titulo} · ${new Date(e.fecha).toLocaleDateString('es-AR')}`,
-    el('div', { class: 'fila' }, marcar(e, 'positiva', 'Respuesta positiva'), marcar(e, 'negativa', 'Respuesta negativa')))));
+  const campo = (rotulo, entrada, tipo, valor, extra = {}) => {
+    const input = el('input', { type: tipo, ...extra });
+    input.value = valor ?? '';
+    return { input, nodo: el('label', { class: 'campo' }, rotulo, input) };
+  };
+  $('medicion-lista').replaceChildren(...m.entradas.map((e) => {
+    const enviada = campo('Enviada el', e, 'date', e.enviada);
+    enviada.input.addEventListener('change', () => guardar(e, { enviada: enviada.input.value || null }));
+    const aplicadas = campo(`Edité (de ${e.sugerencias} ${e.sugerencias === 1 ? 'sugerencia' : 'sugerencias'})`, e, 'number', e.aplicadas, { min: 0, max: e.sugerencias });
+    aplicadas.input.addEventListener('change', () => guardar(e, { aplicadas: aplicadas.input.value === '' ? null : Number(aplicadas.input.value) }));
+    return el('div', { class: 'requisito' },
+      el('strong', {}, `#${e.id} `), `${e.puesto || e.titulo} · ${new Date(e.fecha).toLocaleDateString('es-AR')}`,
+      el('div', { class: 'fila' }, enviada.nodo, aplicadas.nodo),
+      el('div', { class: 'fila' }, marcar(e, 'positiva', 'Respuesta positiva'), marcar(e, 'negativa', 'Respuesta negativa')));
+  }));
 }
 
 /* ---------- paso 1: datos ---------- */

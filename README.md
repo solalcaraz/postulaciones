@@ -32,7 +32,7 @@ Empecé a medir el uso real el 31/10/2026, con un objetivo de 30 postulaciones. 
 - **Claude Code** en modo no interactivo (`claude -p`) para escribir los textos.
 - **docx** para generar el Word, **mammoth** para leer Word, **unpdf** para leer PDF y **ajv** para validar las respuestas de la IA contra un JSON Schema.
 - **LibreOffice o Word** para convertir el CV a PDF y medir cuántas páginas ocupa.
-- **node:test** para las pruebas (51) y el protocolo de depuración de Chrome para probar la pantalla.
+- **node:test** para las pruebas (56) y el protocolo de depuración de Chrome para probar la pantalla.
 
 ## Cómo funciona
 

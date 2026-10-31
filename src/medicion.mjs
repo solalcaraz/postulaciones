@@ -18,8 +18,14 @@ export async function estadoMedicion(datos) {
   return { activa: true, guardando: entradas.length < objetivo, objetivo, hechas: entradas.length, entradas };
 }
 
+// Las sugerencias aplicables son las de tipo título y tecnología (las brechas no se pueden aplicar).
+export const sugerenciasAplicables = (analisis) => analisis.sugerencias.filter((s) => s.tipo !== 'brecha').length;
+
+// El puesto sale de la primera línea de la oferta; se puede corregir a mano en registro.json.
+const puestoDeLaOferta = (oferta) => (oferta.split(/\r?\n/).find((l) => l.trim()) ?? '').trim().slice(0, 80);
+
 // Guarda la postulación si el modo medición está prendido y no llegó al objetivo. Devuelve { numero, objetivo } o null.
-export async function guardarPostulacion(datos, { resultado: r, oferta, segundos }) {
+export async function guardarPostulacion(datos, { resultado: r, oferta, segundos, idioma }) {
   const estado = await estadoMedicion(datos);
   if (!estado.guardando) return null;
   const numero = estado.hechas + 1;
@@ -32,22 +38,35 @@ export async function guardarPostulacion(datos, { resultado: r, oferta, segundos
   await writeFile(join(carpeta, 'oferta.txt'), oferta, 'utf8');
   if (r.guiaTexto) await writeFile(join(carpeta, 'entrevista.txt'), r.guiaTexto, 'utf8');
   const entrada = {
-    id, fecha: new Date().toISOString(), titulo: r.analisis.titulo_elegido.titulo, archivo: r.docx.nombre,
+    id, fecha: new Date().toISOString(), puesto: puestoDeLaOferta(oferta), idioma, titulo: r.analisis.titulo_elegido.titulo, archivo: r.docx.nombre,
     segundos, costoEstimadoUsd: r.costoEstimadoUsd, paginas: r.paginas.cantidad, paginasMedidas: r.paginas.medido,
     palabrasCarta: r.palabrasCarta, frasesProhibidas: r.controles.frasesProhibidas.length, datosNuevos: r.controles.datosNuevos.length,
-    respuesta: null,
+    sugerencias: sugerenciasAplicables(r.analisis), aplicadas: null, enviada: null, respuesta: null,
   };
   await writeFile(join(datos, 'mediciones', 'registro.json'), JSON.stringify([...estado.entradas, entrada], null, 2), 'utf8');
   return { numero, objetivo: estado.objetivo };
 }
 
-// valor: 'positiva', 'negativa' o null (sin respuesta).
-export async function anotarRespuesta(datos, id, valor) {
-  if (valor !== null && !RESPUESTAS.includes(valor)) throw new Error('Respuesta no válida.');
+// Anota lo que pasó después de la postulación. Solo cambia los campos que vienen en `cambios`:
+//   respuesta: 'positiva', 'negativa' o null · enviada: 'AAAA-MM-DD' o null · aplicadas: cuántas de las sugerencias aplicó (0 a las que había) o null.
+export async function anotarCampos(datos, id, cambios) {
   const estado = await estadoMedicion(datos);
   const entrada = estado.entradas.find((e) => e.id === id);
   if (!estado.activa || !entrada) throw new Error('No encuentro esa postulación en la medición.');
-  entrada.respuesta = valor;
+  if ('respuesta' in cambios) {
+    if (cambios.respuesta !== null && !RESPUESTAS.includes(cambios.respuesta)) throw new Error('Respuesta no válida.');
+    entrada.respuesta = cambios.respuesta;
+  }
+  if ('enviada' in cambios) {
+    const f = cambios.enviada;
+    if (f !== null && !(/^\d{4}-\d{2}-\d{2}$/.test(f) && !Number.isNaN(Date.parse(f)))) throw new Error('La fecha de envío no es válida.');
+    entrada.enviada = f;
+  }
+  if ('aplicadas' in cambios) {
+    const n = cambios.aplicadas;
+    if (n !== null && !(Number.isInteger(n) && n >= 0 && n <= entrada.sugerencias)) throw new Error(`Tiene que ser un número de 0 a ${entrada.sugerencias}.`);
+    entrada.aplicadas = n;
+  }
   await writeFile(join(datos, 'mediciones', 'registro.json'), JSON.stringify(estado.entradas, null, 2), 'utf8');
   return entrada;
 }

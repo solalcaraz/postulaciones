@@ -38,7 +38,7 @@ test('el celular aparece solo si se lo pide', async () => {
 });
 
 test('el nombre del archivo sale sin tildes ni caracteres raros', () => {
-  assert.equal(nombreDeArchivo('María Sol Alcaraz', 'Exactian S.A.', 'es'), 'CV-Maria-Sol-Alcaraz-Exactian-S-A-es.docx');
+  assert.equal(nombreDeArchivo('María Sol Alcaraz', 'Empresa Ejemplo S.A.', 'es'), 'CV-Maria-Sol-Alcaraz-Empresa-Ejemplo-S-A-es.docx');
 });
 
 test('si la IA devuelve un formato roto, reintenta una vez y funciona', async () => {

@@ -10,7 +10,7 @@ import { leerArchivo, ErrorArchivo } from '../src/lectura/archivo.mjs';
 import { detectarIdiomas, generarPostulacion } from '../src/postular.mjs';
 import { ErrorIA } from '../src/ia.mjs';
 import { leerMaestro, listarMaestros } from '../src/lectura/maestro.mjs';
-import { estadoMedicion, guardarPostulacion, anotarRespuesta } from '../src/medicion.mjs';
+import { estadoMedicion, guardarPostulacion, anotarCampos } from '../src/medicion.mjs';
 
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
 const PUBLICO = join(RAIZ, 'app', 'public');
@@ -118,7 +118,7 @@ export function crearServidor({ llamarFn, medirFn, carpetaDatos = join(RAIZ, 'da
       trabajo.resultado = { ...resto, docx: { nombre: docx.nombre } };
       trabajo.buffer = docx.buffer;
       try {
-        trabajo.resultado.medicion = await guardarPostulacion(carpetaDatos, { resultado: r, oferta: textoOferta, segundos: Math.round((Date.now() - trabajo.inicio) / 1000) });
+        trabajo.resultado.medicion = await guardarPostulacion(carpetaDatos, { resultado: r, oferta: textoOferta, segundos: Math.round((Date.now() - trabajo.inicio) / 1000), idioma });
       } catch {
         trabajo.resultado.controles.avisos.push('No pude guardar esta postulación en la medición.');
       }
@@ -145,10 +145,11 @@ export function crearServidor({ llamarFn, medirFn, carpetaDatos = join(RAIZ, 'da
         return enviarJson(res, 200, { claude: await verificarClaude(ejecutableClaude), perfil: perfilOk, maestros: await listarMaestros(carpetaDatos), medicion: { activa, guardando, objetivo, hechas } });
       }
       if (req.method === 'GET' && url.pathname === '/api/medicion') return enviarJson(res, 200, await estadoMedicion(carpetaDatos));
-      const respuesta = url.pathname.match(/^\/api\/medicion\/(\d{3,})\/respuesta$/);
-      if (req.method === 'POST' && respuesta) {
-        const { valor } = await leerCuerpo(req);
-        try { return enviarJson(res, 200, await anotarRespuesta(carpetaDatos, respuesta[1], valor ?? null)); } catch (e) { throw new ErrorPedido(e.message); }
+      const anotacion = url.pathname.match(/^\/api\/medicion\/(\d{3,})$/);
+      if (req.method === 'POST' && anotacion) {
+        const { respuesta, enviada, aplicadas } = await leerCuerpo(req);
+        const cambios = Object.fromEntries(Object.entries({ respuesta, enviada, aplicadas }).filter(([, v]) => v !== undefined));
+        try { return enviarJson(res, 200, await anotarCampos(carpetaDatos, anotacion[1], cambios)); } catch (e) { throw new ErrorPedido(e.message); }
       }
       if (req.method === 'POST' && url.pathname === '/api/idiomas') return enviarJson(res, 200, await rutaIdiomas(req));
       if (req.method === 'POST' && url.pathname === '/api/generar') return enviarJson(res, 202, await rutaGenerar(req));
