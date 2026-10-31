@@ -148,6 +148,7 @@ try {
   console.log('   Generar habilitado tras elegir B1:', !(await evaluar(`document.querySelector('#generar').disabled`)));
   await evaluar(`document.querySelector('#generar').click()`);
   await esperar(`!document.querySelector('#paso-progreso').hidden`);
+  await esperar(`document.querySelector('#progreso-mensaje').textContent !== 'Empezando…'`, 10000);
   console.log('3. Progreso:', await evaluar(`document.querySelector('#progreso-mensaje').textContent`));
   await captura('3-progreso');
 

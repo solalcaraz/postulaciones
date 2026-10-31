@@ -18,7 +18,9 @@ La herramienta ataca eso con reglas escritas en los prompts y con controles hech
 
 ![Flujo completo: formulario, confirmación de niveles de idioma, progreso y resultado](docs/demo/flujo.gif)
 
-El GIF es la pantalla real, con una IA simulada y un CV inventado (Ana Ejemplo), para no mostrar datos personales. Las capturas salen de `npm run pantalla`, que maneja un Chrome real. El resultado completo, en [docs/demo/resultado.png](docs/demo/resultado.png), y en celular, en [docs/demo/resultado-celular.png](docs/demo/resultado-celular.png).
+Es una corrida real, con Claude, mi CV maestro y una oferta de desarrollador de software back-end publicada en LinkedIn. Difuminé mi ubicación y mi email, y el nombre de la empresa. En el cuadro de la oferta lo reemplacé por `[empresa]` porque un cuadro de texto no se puede difuminar a medias. Quedan visibles los requisitos, qué hace la empresa y mis datos públicos (LinkedIn y GitHub).
+
+En esta corrida el CV ocupó una página y un 4 % de la segunda. La herramienta lo marca como caso límite en las alertas, y no lo recorté a mano para no maquillar el resultado. El resultado completo está en [docs/demo/resultado.png](docs/demo/resultado.png), el CV en [docs/demo/cv-generado.png](docs/demo/cv-generado.png) y la pantalla en celular en [docs/demo/resultado-celular.png](docs/demo/resultado-celular.png). Las capturas salen de `npm run pantalla` (con `PANTALLA_REAL=1` usa Claude de verdad; los detalles están al principio de [tests/e2e/pantalla.mjs](tests/e2e/pantalla.mjs)).
 
 No hay demo online: la herramienta usa la sesión de Claude Code de mi compu, así que no tiene sentido publicarla en un hosting.
 
@@ -30,7 +32,7 @@ Todavía no tengo métricas de uso real (cuántas postulaciones hice con ella, c
 - **Claude Code** en modo no interactivo (`claude -p`) para escribir los textos.
 - **docx** para generar el Word, **mammoth** para leer Word, **unpdf** para leer PDF y **ajv** para validar las respuestas de la IA contra un JSON Schema.
 - **LibreOffice o Word** para convertir el CV a PDF y medir cuántas páginas ocupa.
-- **node:test** para las pruebas (46) y el protocolo de depuración de Chrome para probar la pantalla.
+- **node:test** para las pruebas (51) y el protocolo de depuración de Chrome para probar la pantalla.
 
 ## Cómo funciona
 
@@ -68,8 +70,9 @@ npm install
 ```
 
 1. Copiá `plantillas/perfil.plantilla.md` a `datos-privados/perfil.md` y completalo con tus datos y proyectos.
-2. Ejecutá `npm start`, o hacé doble clic en `Abrir Postulaciones.cmd`.
-3. Abrí `http://127.0.0.1:4400`, subí tu CV, pegá la oferta y seguí los pasos. La ventana de la terminal tiene que quedar abierta.
+2. Opcional: dejá tu CV completo en `datos-privados/` con un nombre que empiece con `CV-maestro` (por ejemplo `CV-maestro-es.docx`). Así no hace falta subirlo cada vez; si subís uno, manda el subido.
+3. Ejecutá `npm start`, o hacé doble clic en `Abrir Postulaciones.cmd`.
+4. Abrí `http://127.0.0.1:4400`, pegá la oferta (y subí tu CV si no usás el maestro) y seguí los pasos. La ventana de la terminal tiene que quedar abierta.
 
 También se puede correr sin pantalla:
 
