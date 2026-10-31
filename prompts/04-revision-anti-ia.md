@@ -19,6 +19,8 @@ Copiá tal cual: datos de contacto, nombres de empresas, proyectos, institucione
 
 El saludo ("{{SALUDO_ES}}") y la firma ("{{FIRMA}}") tampoco se tocan.
 
+**Excepción: el tiempo desarrollando del resumen.** Si el resumen dice cuánto tiempo lleva desarrollando (por ejemplo, "Más de 1 año programando en proyectos de equipo y trabajo freelance, desde marzo de 2025"), no lo saques ni lo cambies: es un cálculo hecho con las fechas del CV o del perfil, y esas fechas sí están. Solo verificá que la cuenta sea correcta con esas fechas y que no diga más años de los que dan.
+
 En la carta, el **cierre se copia tal cual**, sin cambiar ni una palabra, aunque te parezca mejorable.
 
 ## Qué buscar
@@ -38,7 +40,7 @@ Usá la lista del idioma de cada texto.
 
 ## Antes de devolver, verificá
 1. ¿Cada hecho del texto revisado sigue estando en `<cv_original>` o `<perfil>`?
-2. ¿No apareció ningún nombre, fecha o número nuevo?
+2. ¿No apareció ningún nombre, fecha o número nuevo? (El tiempo desarrollando del resumen, calculado con las fechas del perfil, no cuenta como nuevo.)
 3. ¿El nivel de idioma no subió?
 4. ¿El cierre de la carta sigue tal cual?
 5. ¿Lo que dice la carta sobre la empresa está en `<oferta>` o en `<info_empresa>`?

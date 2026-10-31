@@ -1,6 +1,6 @@
 # Postulaciones
 
-Herramienta local que adapta mi CV a cada oferta de trabajo: subo el CV completo, pego la oferta y me devuelve un CV en Word de una página, una carta corta y un análisis de qué cubro y qué no. La armé yo sola en 2026, como proyecto personal, sin materia ni institución de por medio. Nació de un problema propio: tener que adaptar mi CV para cada propuesta de trabajo.
+Herramienta local que adapta mi CV a cada oferta de trabajo: subo el CV completo, pego la oferta y me devuelve un CV en Word de una página, una carta corta y un análisis de qué cubro y qué no. La armé sola en 2026, como proyecto personal. Nació de un problema propio: tener que adaptar mi CV para cada propuesta de trabajo.
 
 ## Problema que resuelve
 
@@ -62,45 +62,18 @@ Las decisiones que tomé y por qué:
 
 ## Cómo correrlo
 
-Lo probé en Windows 11. Necesitás Node.js y [Claude Code](https://claude.com/claude-code) con la sesión iniciada (escribí `claude` en una terminal y seguí los pasos). Para medir las páginas hace falta Word o LibreOffice.
+Necesita Windows, Node.js y Claude Code con la sesión iniciada. Para medir las páginas del CV hace falta Word o LibreOffice.
 
 ```bash
 git clone https://github.com/solalcaraz/postulaciones.git
 cd postulaciones
 npm install
+npm start
 ```
 
-1. Copiá `plantillas/perfil.plantilla.md` a `datos-privados/perfil.md` y completalo con tus datos y proyectos.
-2. Opcional: dejá tu CV completo en `datos-privados/` con un nombre que empiece con `CV-maestro` (por ejemplo `CV-maestro-es.docx`). Así no hace falta subirlo cada vez; si subís uno, manda el subido.
-3. Ejecutá `npm start`, o hacé doble clic en `Abrir Postulaciones.cmd`.
-4. Abrí `http://127.0.0.1:4400`, pegá la oferta (y subí tu CV si no usás el maestro) y seguí los pasos. La ventana de la terminal tiene que quedar abierta.
+Después abrí `http://127.0.0.1:4400`. En Windows también sirve `Abrir Postulaciones.cmd`. Las pruebas se corren con `npm test`.
 
-También se puede correr sin pantalla:
-
-```bash
-node scripts/postular.mjs --oferta oferta.md --cv mi-cv.docx --perfil datos-privados/perfil.md --niveles es=nativo,en=B1
-```
-
-Pruebas (usan una IA simulada y datos inventados, no gastan cupo):
-
-```bash
-npm test
-npm run pantalla   # necesita Chrome; deja capturas de cada paso en datos-privados/capturas
-```
-
-### Si lo clonás para usarlo vos
-
-Armé esta herramienta para resolver mi propio problema, así que está hecha a mi medida: mi perfil, mi firma y mis ejemplos. El flujo es el de "Cómo funciona": dejás o subís tu CV completo, pegás la oferta, confirmás los niveles de idioma y bajás el Word, la carta y el análisis. Para usarla con tus datos tenés que reemplazar o agregar esto:
-
-| Archivo | Qué hacer |
-|---|---|
-| `datos-privados/perfil.md` | Crealo desde `plantillas/perfil.plantilla.md`. Es la fuente de verdad: contacto, títulos posibles y proyectos con sus números. Git lo ignora. |
-| `datos-privados/CV-maestro*.docx` o `.pdf` | Opcional. Tu CV completo; si no lo dejás ahí, lo subís en la pantalla. Con uno por idioma, terminá los nombres en `-es` y `-en`. |
-| `src/config.mjs` | Tu firma y los saludos de la carta. |
-| `prompts/02-cv.md` | Los ejemplos de BookLibre y del resumen son míos: cambialos por proyectos tuyos. |
-| `prompts/niveles-idioma.md` | Los ejemplos de Calis Trainer son míos: cambialos. |
-
-Los prompts están escritos en femenino y en español rioplatense. Si querés otro registro, cambiá los archivos de `prompts/`.
+Estos archivos son míos y tendrían que cambiarse para usarla con otros datos: `datos-privados/perfil.md` (se arma desde `plantillas/perfil.plantilla.md`), `datos-privados/CV-maestro*` (mi CV completo), `src/config.mjs` (firma y saludo de la carta) y los ejemplos de `prompts/02-cv.md` y `prompts/niveles-idioma.md`.
 
 ## Qué aprendí y qué mejoraría
 

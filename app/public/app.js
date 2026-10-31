@@ -292,6 +292,7 @@ function mostrarResultado(r) {
   ];
   $('resultado').replaceChildren(...contenido.filter(Boolean));
   mostrarPaso('paso-resultado');
+  if (r.medicion) cargarMedicion().catch(() => {});
 }
 
 $('nueva').addEventListener('click', async () => {
