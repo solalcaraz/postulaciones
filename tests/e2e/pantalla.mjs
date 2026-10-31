@@ -155,6 +155,7 @@ try {
   await esperar(`!document.querySelector('#paso-resultado').hidden`, real ? 600000 : 20000);
   console.log('4. Resultado listo');
   await captura('4-resultado');
+  console.log('   corte de la carta (px):', await evaluar(`Math.round(document.querySelectorAll('#resultado .bloque')[1].getBoundingClientRect().bottom + scrollY)`));
   const enlace = await evaluar(`document.querySelector('#resultado a.boton').getAttribute('href')`);
   const descarga = await fetch(`http://127.0.0.1:${puerto}${enlace}`);
   console.log('   descarga del .docx:', descarga.status, descarga.headers.get('content-disposition'));
@@ -171,6 +172,7 @@ try {
   await captura('5-resultado-oscuro');
   await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
   await captura('6-resultado-celular', 390);
+  console.log('   corte de la carta en celular (px):', await evaluar(`Math.round(document.querySelectorAll('#resultado .bloque')[1].getBoundingClientRect().bottom + scrollY)`));
 
   // Nada se guarda en el navegador.
   console.log('   localStorage vacío:', (await evaluar('localStorage.length')) === 0, '· cookies:', JSON.stringify(await evaluar('document.cookie')));
