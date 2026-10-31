@@ -13,6 +13,8 @@
   --alerta-fondo: #fbf1da;
   --error: #9b2c2c;
   --error-fondo: #fbe8e8;
+  --ok: #2f6b45;
+  --ok-fondo: #e6f2ea;
   --sombra: 0 .0625rem .1875rem rgb(36 34 30 / .06), 0 .5rem 1.5rem rgb(36 34 30 / .04);
 
   /* Espaciado: una sola escala para toda la pantalla */
@@ -50,6 +52,8 @@
     --alerta-fondo: #372d14;
     --error: #f0a0a0;
     --error-fondo: #3b1c1c;
+    --ok: #8fcfa5;
+    --ok-fondo: #20332a;
     --sombra: 0 .0625rem .1875rem rgb(0 0 0 / .3);
   }
 }
@@ -94,7 +98,7 @@ label { display: block; margin-bottom: var(--e1); }
 .casilla input { width: 1.125rem; height: 1.125rem; margin: 0; accent-color: var(--acento); flex: none; }
 .ayuda { color: var(--suave); font-weight: 400; font-size: var(--t-chica); margin: var(--e1) 0 0; }
 
-input[type="text"], input[type="tel"], select, textarea {
+input[type="text"], input[type="tel"], input[type="date"], input[type="number"], select, textarea {
   width: 100%;
   min-height: 2.75rem;
   padding: var(--e2) var(--e3);
@@ -105,7 +109,7 @@ input[type="text"], input[type="tel"], select, textarea {
   border-radius: var(--radio-chico);
   transition: border-color .15s, box-shadow .15s;
 }
-input[type="text"]:hover, input[type="tel"]:hover, select:hover, textarea:hover { border-color: var(--suave); }
+input[type="text"]:hover, input[type="tel"]:hover, input[type="date"]:hover, input[type="number"]:hover, select:hover, textarea:hover { border-color: var(--suave); }
 textarea { resize: vertical; line-height: 1.5; }
 input[type="file"] { display: block; width: 100%; font: inherit; max-width: 100%; padding: var(--e2) 0; }
 input[type="file"]::file-selector-button {
@@ -181,6 +185,19 @@ ul.lista li { margin: var(--e2) 0; }
 
 .requisito { margin: 0 0 var(--e4); }
 .requisito label.campo { display: grid; gap: var(--e1); font-weight: 500; }
+.medicion-fila { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--e3) var(--e4); margin-top: var(--e2); }
+.medicion-fila .campo { margin: 0; }
+.medicion-fila .campo + .campo { min-width: 13.5rem; }
+.medicion-fila input[type="date"] { width: 10.5rem; }
+.medicion-fila input[type="number"] { width: 6rem; }
+.respuesta {
+  min-width: 11rem; min-height: 2.75rem; padding: 0 var(--e4); font: inherit; font-size: var(--t-chica); font-weight: 600; cursor: pointer;
+  color: var(--suave); background: transparent; border: 1px solid var(--linea); border-radius: var(--radio-chico);
+  transition: color .15s, background-color .15s, border-color .15s;
+}
+.respuesta:hover { border-color: var(--suave); }
+.respuesta[data-estado="positiva"] { color: var(--ok); background: var(--ok-fondo); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.respuesta[data-estado="negativa"] { color: var(--error); background: var(--error-fondo); border-color: color-mix(in srgb, var(--error) 35%, transparent); }
 .puntaje {
   display: inline-block;
   margin-right: var(--e2);

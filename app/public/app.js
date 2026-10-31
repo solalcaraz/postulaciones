@@ -86,30 +86,50 @@ async function cargarMedicion() {
   $('medicion').hidden = !m.activa;
   if (!m.activa) return;
   $('medicion-resumen').textContent = `${m.hechas} de ${m.objetivo} postulaciones guardadas. ${m.guardando ? 'Sigo guardando las nuevas.' : 'Llegué al objetivo: ya no guardo postulaciones nuevas, pero podés seguir anotando respuestas.'}`;
+  // Se guarda sin volver a dibujar el panel, para no perder el foco mientras se escribe.
   const guardar = async (entrada, cambios) => {
-    try { await api(`/api/medicion/${entrada.id}`, { method: 'POST', body: JSON.stringify(cambios) }); } catch (error) { mostrarError(error.message); }
-    cargarMedicion();
+    try { Object.assign(entrada, await api(`/api/medicion/${entrada.id}`, { method: 'POST', body: JSON.stringify(cambios) })); } catch (error) { mostrarError(error.message); cargarMedicion(); }
   };
-  const marcar = (entrada, valor, texto) => {
-    const casilla = el('input', { type: 'checkbox' });
-    casilla.checked = entrada.respuesta === valor;
-    casilla.addEventListener('change', () => guardar(entrada, { respuesta: casilla.checked ? valor : null }));
-    return el('label', { class: 'casilla' }, casilla, ` ${texto}`);
+  // Un solo botón con tres estados: sin respuesta (apagado), positiva (verde suave) y negativa (rojo suave). Cada toque pasa al siguiente.
+  const ESTADOS = [null, 'positiva', 'negativa'];
+  const TEXTO_ESTADO = { null: 'Sin respuesta', positiva: 'Respuesta positiva', negativa: 'Respuesta negativa' };
+  const botonRespuesta = (entrada) => {
+    const boton = el('button', { type: 'button', class: 'respuesta' });
+    const pintar = () => {
+      boton.dataset.estado = entrada.respuesta ?? 'ninguna';
+      boton.textContent = TEXTO_ESTADO[entrada.respuesta];
+      boton.setAttribute('aria-label', `Postulación ${entrada.id}: ${TEXTO_ESTADO[entrada.respuesta]}. Tocá para cambiar.`);
+    };
+    let espera;
+    boton.addEventListener('click', () => {
+      entrada.respuesta = ESTADOS[(ESTADOS.indexOf(entrada.respuesta ?? null) + 1) % ESTADOS.length];
+      pintar();
+      clearTimeout(espera);
+      espera = setTimeout(() => guardar(entrada, { respuesta: entrada.respuesta }), 400);
+    });
+    pintar();
+    return boton;
   };
-  const campo = (rotulo, entrada, tipo, valor, extra = {}) => {
-    const input = el('input', { type: tipo, ...extra });
+  const campo = (rotulo, valor, extra) => {
+    const input = el('input', extra);
     input.value = valor ?? '';
     return { input, nodo: el('label', { class: 'campo' }, rotulo, input) };
   };
+  const ANIO_MIN = '2020-01-01';
+  const ANIO_MAX = '2100-12-31';
   $('medicion-lista').replaceChildren(...m.entradas.map((e) => {
-    const enviada = campo('Enviada el', e, 'date', e.enviada);
-    enviada.input.addEventListener('change', () => guardar(e, { enviada: enviada.input.value || null }));
-    const aplicadas = campo(`Edité (de ${e.sugerencias} ${e.sugerencias === 1 ? 'sugerencia' : 'sugerencias'})`, e, 'number', e.aplicadas, { min: 0, max: e.sugerencias });
+    const enviada = campo('Enviada el', e.enviada, { type: 'date', min: ANIO_MIN, max: ANIO_MAX });
+    // Mientras se escribe el año, el navegador da fechas parciales (por ejemplo, el año 0002): solo se guarda una fecha completa.
+    enviada.input.addEventListener('change', () => {
+      const valor = enviada.input.value;
+      if (valor === '') guardar(e, { enviada: null });
+      else if (valor >= ANIO_MIN && valor <= ANIO_MAX) guardar(e, { enviada: valor });
+    });
+    const aplicadas = campo(`Edité (de ${e.sugerencias} ${e.sugerencias === 1 ? 'sugerencia' : 'sugerencias'})`, e.aplicadas, { type: 'number', min: 0, max: e.sugerencias });
     aplicadas.input.addEventListener('change', () => guardar(e, { aplicadas: aplicadas.input.value === '' ? null : Number(aplicadas.input.value) }));
     return el('div', { class: 'requisito' },
-      el('strong', {}, `#${e.id} `), `${e.puesto || e.titulo} · ${new Date(e.fecha).toLocaleDateString('es-AR')}`,
-      el('div', { class: 'fila' }, enviada.nodo, aplicadas.nodo),
-      el('div', { class: 'fila' }, marcar(e, 'positiva', 'Respuesta positiva'), marcar(e, 'negativa', 'Respuesta negativa')));
+      el('strong', {}, `#${e.id} `), [e.puesto || e.titulo, e.empresa, new Date(e.fecha).toLocaleDateString('es-AR')].filter(Boolean).join(' · '),
+      el('div', { class: 'medicion-fila' }, enviada.nodo, aplicadas.nodo, botonRespuesta(e)));
   }));
 }
 

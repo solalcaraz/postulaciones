@@ -25,7 +25,7 @@ export const sugerenciasAplicables = (analisis) => analisis.sugerencias.filter((
 const puestoDeLaOferta = (oferta) => (oferta.split(/\r?\n/).find((l) => l.trim()) ?? '').trim().slice(0, 80);
 
 // Guarda la postulación si el modo medición está prendido y no llegó al objetivo. Devuelve { numero, objetivo } o null.
-export async function guardarPostulacion(datos, { resultado: r, oferta, segundos, idioma }) {
+export async function guardarPostulacion(datos, { resultado: r, oferta, segundos, idioma, empresa = '' }) {
   const estado = await estadoMedicion(datos);
   if (!estado.guardando) return null;
   const numero = estado.hechas + 1;
@@ -38,7 +38,7 @@ export async function guardarPostulacion(datos, { resultado: r, oferta, segundos
   await writeFile(join(carpeta, 'oferta.txt'), oferta, 'utf8');
   if (r.guiaTexto) await writeFile(join(carpeta, 'entrevista.txt'), r.guiaTexto, 'utf8');
   const entrada = {
-    id, fecha: new Date().toISOString(), puesto: puestoDeLaOferta(oferta), idioma, titulo: r.analisis.titulo_elegido.titulo, archivo: r.docx.nombre,
+    id, fecha: new Date().toISOString(), puesto: puestoDeLaOferta(oferta), empresa, idioma, titulo: r.analisis.titulo_elegido.titulo, archivo: r.docx.nombre,
     segundos, costoEstimadoUsd: r.costoEstimadoUsd, paginas: r.paginas.cantidad, paginasMedidas: r.paginas.medido,
     palabrasCarta: r.palabrasCarta, frasesProhibidas: r.controles.frasesProhibidas.length, datosNuevos: r.controles.datosNuevos.length,
     sugerencias: sugerenciasAplicables(r.analisis), aplicadas: null, enviada: null, respuesta: null,
@@ -59,7 +59,7 @@ export async function anotarCampos(datos, id, cambios) {
   }
   if ('enviada' in cambios) {
     const f = cambios.enviada;
-    if (f !== null && !(/^\d{4}-\d{2}-\d{2}$/.test(f) && !Number.isNaN(Date.parse(f)))) throw new Error('La fecha de envío no es válida.');
+    if (f !== null && !(/^\d{4}-\d{2}-\d{2}$/.test(f) && f >= '2020-01-01' && f <= '2100-12-31' && !Number.isNaN(Date.parse(f)))) throw new Error('La fecha de envío no es válida.');
     entrada.enviada = f;
   }
   if ('aplicadas' in cambios) {

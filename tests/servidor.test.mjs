@@ -252,6 +252,7 @@ test('modo medición: guarda hasta el objetivo, deja de guardar y permite anotar
 
       const anotar = (id, cuerpo) => pedir(`/api/medicion/${id}`, { metodo: 'POST', cuerpo });
       const registro = async () => JSON.parse(await readFile(join(datos, 'mediciones', 'registro.json'), 'utf8'))[0];
+      assert.equal(m.entradas[0].empresa, 'Empresa');
       assert.deepEqual([m.entradas[0].puesto, m.entradas[0].idioma, m.entradas[0].sugerencias, m.entradas[0].aplicadas, m.entradas[0].enviada], [OFERTA_LARGA.split('\n')[0].slice(0, 80), 'es', 1, null, null]);
 
       assert.equal((await (await anotar('001', { respuesta: 'positiva' })).json()).respuesta, 'positiva');
@@ -264,6 +265,7 @@ test('modo medición: guarda hasta el objetivo, deja de guardar y permite anotar
       assert.equal((await anotar('001', { aplicadas: 2 })).estado, 400, 'no puede haber más aplicadas que sugerencias');
       assert.equal((await anotar('001', { aplicadas: 1.5 })).estado, 400);
       assert.equal((await anotar('001', { enviada: '2 de noviembre' })).estado, 400);
+      assert.equal((await anotar('001', { enviada: '0002-11-02' })).estado, 400, 'un año de una sola cifra no es una fecha de envío');
       assert.equal((await (await anotar('001', { respuesta: null, enviada: null, aplicadas: null })).json()).respuesta, null);
     });
   } finally { await rm(datos, { recursive: true, force: true }); }

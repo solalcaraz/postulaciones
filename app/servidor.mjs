@@ -118,7 +118,7 @@ export function crearServidor({ llamarFn, medirFn, carpetaDatos = join(RAIZ, 'da
       trabajo.resultado = { ...resto, docx: { nombre: docx.nombre } };
       trabajo.buffer = docx.buffer;
       try {
-        trabajo.resultado.medicion = await guardarPostulacion(carpetaDatos, { resultado: r, oferta: textoOferta, segundos: Math.round((Date.now() - trabajo.inicio) / 1000), idioma });
+        trabajo.resultado.medicion = await guardarPostulacion(carpetaDatos, { resultado: r, oferta: textoOferta, segundos: Math.round((Date.now() - trabajo.inicio) / 1000), idioma, empresa: String(empresa || '').slice(0, 60) });
       } catch {
         trabajo.resultado.controles.avisos.push('No pude guardar esta postulación en la medición.');
       }
