@@ -1,10 +1,10 @@
 // Corre una postulación completa sin interfaz y guarda los resultados en una carpeta (solo para probar; la app no guarda nada).
 //
-//   node scripts/postular.mjs --oferta tests/ofertas/a-backend-jr-java.md --cv datos-privados/CV-maestro-Maria-Sol-Alcaraz-es.docx \
-//        --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Exactian]
+//   node scripts/postular.mjs --oferta tests/ofertas/a-backend-jr-java.md --cv <tu-cv.pdf o .docx> \
+//        --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Nombre]
 //
 // Opciones: --guia (también arma la guía de entrevista; sin esto no se genera) · --info <archivo> (información extra de la empresa) · --idioma auto|es|en · --salida <carpeta> · --dry (arma los textos, no llama a la IA)
-// Si no se pasa --niveles, muestra los que detectó en el CV y se detiene: es la confirmación que después hará la pantalla.
+// Si no se pasa --niveles, muestra los que detectó en el CV y se detiene: es la misma confirmación que pide la pantalla.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -1,5 +1,5 @@
-// Formato de lo que devuelve la IA. Es la fuente de verdad: Claude Code lo usa para validar la respuesta (--json-schema).
-// En la Fase 3 se vuelve a validar con código antes de usarla.
+// Formato de lo que devuelve la IA. Es la fuente de verdad: Claude Code lo usa para validar la respuesta (--json-schema)
+// y src/validacion/esquema.mjs la vuelve a validar con ajv antes de usarla.
 
 const texto = { type: 'string' };
 const lista = { type: 'array', items: texto };
@@ -67,8 +67,6 @@ const cv = obj({
   idiomas: arr(obj({ idioma: texto, nivel: texto })),
   eventos_y_cursos: lista,
 });
-
-export const cvSchema = cv;
 
 const carta = obj({ saludo: texto, cuerpo: texto, firma: texto });
 

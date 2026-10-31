@@ -39,7 +39,7 @@ test('rechaza archivos de más de 8 MB y archivos vacíos', async () => {
   await assert.rejects(leerArchivo(Buffer.alloc(0), 'cv.pdf'), /vacío/);
 });
 
-test('lee un PDF real con texto (si el CV de la usuaria está en datos-privados)', async (t) => {
+test('lee un PDF real con texto (se saltea si no hay un PDF de prueba en datos-privados)', async (t) => {
   const ruta = 'datos-privados/Alcaraz, Maria Sol Alcaraz - Desarrollo.pdf';
   if (!existsSync(ruta)) return t.skip('no hay PDF de prueba en datos-privados');
   const texto = await leerArchivo(await readFile(ruta), 'cv.pdf');

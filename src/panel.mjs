@@ -1,4 +1,4 @@
-// Panel de análisis en texto (Markdown). La pantalla de la Fase 4 va a mostrar lo mismo con otro formato.
+// Panel de análisis en texto (Markdown), para el script de la terminal. La pantalla arma el suyo en app/public/app.js.
 const lista = (items) => (items.length ? items.map((i) => `- ${i}`).join('\n') : '- (nada)');
 
 const ROTULO = { titulo: 'Título sugerido', tecnologia: 'Tecnología sugerida', brecha: 'Brecha' };

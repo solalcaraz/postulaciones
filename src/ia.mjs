@@ -1,6 +1,6 @@
-// Llama a Claude Code en modo no interactivo, con la suscripción de quien lo tenga iniciado en esta compu.
-// Basado en C:\Users\alcar\Desktop\rumbo-españa\app\lib\ia.js. Sin herramientas, sin MCP, sin configuraciones del usuario,
-// sin guardar la conversación y con la salida validada contra un esquema JSON.
+// Llama a Claude Code en modo no interactivo, con la sesión que esté iniciada en esta compu (sin API key).
+// Sin herramientas, sin MCP, sin configuraciones del usuario, sin guardar la conversación
+// y con la salida pedida contra un esquema JSON.
 //
 // Las instrucciones largas van por la entrada estándar: la línea de comandos de Windows tiene un límite de unos 32.000 caracteres.
 import { spawn } from 'node:child_process';
