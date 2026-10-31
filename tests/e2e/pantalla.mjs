@@ -22,8 +22,20 @@ await mkdir(capturas, { recursive: true });
 await writeFile(join(temporal, 'perfil.md'), PERFIL, 'utf8');
 const rutaCv = real ? process.env.PANTALLA_CV : join(temporal, 'cv-ejemplo.docx');
 if (!real) await writeFile(rutaCv, (await generarCv({ cv: CV_ES, contacto: { nombre: 'Ana Ejemplo' }, idioma: 'es' })).buffer);
-const textoOferta = real ? await readFile(process.env.PANTALLA_OFERTA, 'utf8') : OFERTA + ' ' + 'Valoramos el trabajo en equipo y la comunicación clara. '.repeat(3);
-const app = real ? crearServidor() : crearServidor({ llamarFn: iaPorEsquema({ espera: 1500 }), rutaPerfil: join(temporal, 'perfil.md'), ejecutableClaude: process.execPath });
+const textoOferta = real ? await readFile(process.env.PANTALLA_OFERTA, 'utf8') : OFERTA + ' Valoramos el trabajo en equipo y la comunicación clara.';
+// Carta inventada, con solo datos del perfil y la oferta de ejemplo, para que las capturas se vean como un resultado real.
+const CARTA_EJEMPLO = [
+  'Vi que buscan a alguien con Kotlin y PostgreSQL para sumarse a un equipo chico, y ese es justo el tipo de lugar donde me gusta trabajar: pocas personas, mucha comunicación y responsabilidad compartida sobre lo que se entrega.',
+  'Me defino como desarrolladora full stack que arma las cosas de punta a punta. Trabajo con Kotlin y PostgreSQL, me gusta entender el problema antes de escribir código y prefiero explicar una decisión técnica con palabras simples antes que esconderla detrás de la jerga. En un equipo chico eso ayuda: cada persona sabe en qué anda la otra y los cambios no sorprenden a nadie.',
+  'Un ejemplo concreto es la Tienda de ejemplo, un proyecto en equipo de 4 personas. Mi parte fue el carrito de compras en Kotlin. Cuando empezamos teníamos 10 tests y terminamos con 25, porque cada vez que tocaba el carrito sumaba pruebas para las reglas nuevas. Eso nos dejó cambiar cosas sin miedo a romper lo que ya funcionaba, y la entrega salió ordenada. Esa costumbre de probar primero lo que más duele es la que llevo a cualquier equipo nuevo.',
+  'Me gustaría conversar sobre cómo trabaja el equipo hoy y qué necesitan resolver primero. Puedo escribir a rrhh@empresa.com para coordinar una charla cuando les quede cómodo.',
+].join('\n\n');
+const iaDeEjemplo = async (pedido) => {
+  const respuesta = await iaPorEsquema({ espera: 1500 })(pedido);
+  if (respuesta.resultado.carta) respuesta.resultado.carta.cuerpo = CARTA_EJEMPLO;
+  return respuesta;
+};
+const app = real ? crearServidor() : crearServidor({ llamarFn: iaDeEjemplo, rutaPerfil: join(temporal, 'perfil.md'), ejecutableClaude: process.execPath });
 const puerto = await app.escuchar(0);
 
 // Chrome sin ventana.
@@ -85,6 +97,8 @@ try {
   }
   if (real) await evaluar(`document.querySelector('#usar-guia').click()`);
   await evaluar(`document.querySelector('#empresa').value = 'Empresa'`);
+  await evaluar(`document.querySelector('#error').hidden = true`);
+  await captura('1b-formulario-completo');
   await evaluar(`document.querySelector('#continuar').click()`);
   await esperar(`!document.querySelector('#paso-niveles').hidden`, real ? 120000 : 20000);
   console.log('2. Niveles detectados. Generar deshabilitado hasta confirmar el inglés (que figura como "intermedio"):', await evaluar(`document.querySelector('#generar').disabled`), '·', await evaluar(`document.querySelector('#falta-nivel').textContent`));
