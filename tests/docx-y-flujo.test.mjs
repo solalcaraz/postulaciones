@@ -69,7 +69,7 @@ test('flujo completo con una IA simulada: genera el .docx, la carta y los contro
   const r = await generarPostulacion({ ...base, llamarFn: ia });
   assert.equal(ia.llamadas, 2);
   assert.equal(r.docx.nombre, 'CV-Ana-Ejemplo-Empresa-es.docx');
-  assert.equal(r.palabrasCarta, 170);
+  assert.equal(r.palabrasCarta, 230);
   assert.match(r.cartaTexto, /^Hola, ¿qué tal\?/);
   assert.match(r.cartaTexto, /Ana Ejemplo$/);
   assert.equal(r.controles.frasesProhibidas.length, 0);
@@ -104,7 +104,7 @@ test('avisa si la carta se pasa del largo pedido', async () => {
   const larga = revisionEjemplo();
   larga.carta.cuerpo = Array.from({ length: 300 }, (_, i) => `p${i}`).join(' ');
   const r = await generarPostulacion({ ...base, llamarFn: iaFalsa([resultadoEjemplo(), larga]) });
-  assert.ok(r.controles.avisos.some((a) => /150 a 220/.test(a)));
+  assert.ok(r.controles.avisos.some((a) => /200 a 280/.test(a)));
 });
 
 test('la guía de entrevista no se genera si no se pidió, y sí si se pidió', async () => {

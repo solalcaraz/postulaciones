@@ -88,7 +88,7 @@ export async function generarPostulacion({ cv, oferta, perfil, infoEmpresa = '',
   if (!medida) avisos.push(`No pude medir las páginas reales (hace falta Word o LibreOffice). Estimación: unas ${docx.paginasEstimadas}.`);
   else if (estado === 'limite') avisos.push(`Caso límite: el CV ocupa 2 páginas, pero la segunda llena solo un ${Math.round(medida.ultima * 100)} %. Si podés, cortalo para que entre en una.`);
   else if (estado === 'largo') avisos.push(`El CV ocupa ${medida.paginas} páginas (la última, llena en un ${Math.round(medida.ultima * 100)} %) y no se pudo acortar solo: recortalo a mano.`);
-  if (palabrasCarta < 150 || palabrasCarta > 220) avisos.push(`La carta tiene ${palabrasCarta} palabras: el objetivo es de 150 a 220.`);
+  if (palabrasCarta < 200 || palabrasCarta > 280) avisos.push(`La carta tiene ${palabrasCarta} palabras: el objetivo es de 200 a 280.`);
 
   return {
     analisis: resultado.analisis,

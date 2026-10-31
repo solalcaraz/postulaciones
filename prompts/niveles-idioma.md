@@ -19,7 +19,7 @@
 - **Vocabulario:** palabras muy frecuentes. Verbos: built, made, used, worked on, learned, fixed, helped.
 - **No usar:** voz pasiva, presente perfecto, oraciones relativas, phrasal verbs, condicionales.
 - **CV:** "Built a website for a trainer. Used Astro and Sanity."
-- **Carta:** se llega a 150 palabras con más oraciones, no con oraciones más largas.
+- **Carta:** se llega a 200 palabras con más oraciones, no con oraciones más largas.
 
 ## B1
 - **Oraciones:** de 8 a 15 palabras.

@@ -36,7 +36,7 @@ export const CV_ES = {
 
 export const CARTA = {
   saludo: 'Hola, ¿qué tal?',
-  cuerpo: Array.from({ length: 170 }, (_, i) => `palabra${i}`).join(' '),
+  cuerpo: Array.from({ length: 230 }, (_, i) => `palabra${i}`).join(' '),
   firma: 'Ana Ejemplo',
 };
 

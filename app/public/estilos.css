@@ -34,7 +34,7 @@
 
   --radio: 1rem;
   --radio-chico: .625rem;
-  --medida: 70ch; /* largo cómodo de línea para leer */
+  --margen: clamp(1rem, 4vw, 4rem); /* margen general a los lados de la pantalla */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]) {
@@ -63,15 +63,15 @@ body {
   font: var(--t-base)/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Contenedor: ocupa el ancho disponible con un margen a los lados, sin pasarse de 48rem */
-.encabezado, main { width: min(100% - 2 * var(--e4), 48rem); margin-inline: auto; }
+/* Contenedor: ocupa todo el ancho disponible, con un margen general a los lados que crece con la pantalla */
+.encabezado, main { width: calc(100% - 2 * var(--margen)); margin-inline: auto; }
 .encabezado { padding-block: var(--e7) var(--e2); }
 main { padding-bottom: var(--e7); }
 
 h1 { margin: 0 0 var(--e2); font-size: var(--t-h1); line-height: 1.15; letter-spacing: -.02em; }
 h2 { margin: 0 0 var(--e4); font-size: var(--t-h2); line-height: 1.25; letter-spacing: -.01em; }
 h3 { margin: 0 0 var(--e2); font-size: var(--t-h3); line-height: 1.3; }
-p { margin: 0 0 var(--e3); max-width: var(--medida); }
+p { margin: 0 0 var(--e3); }
 .encabezado p { color: var(--suave); font-size: 1.0625rem; margin: 0; }
 
 section {
@@ -175,11 +175,11 @@ table.niveles select { margin: 0; min-width: 9rem; }
 .bloque:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
 .titulo-cv { font-size: var(--t-h3); font-weight: 700; margin-bottom: var(--e1); }
 .nota { color: var(--suave); font-size: var(--t-chica); }
-ul.lista { margin: var(--e2) 0 var(--e4); padding-left: 1.25rem; max-width: var(--medida); }
+ul.lista { margin: var(--e2) 0 var(--e4); padding-left: 1.25rem; }
 ul.lista li { margin: var(--e2) 0; }
 .etiqueta { margin: var(--e5) 0 var(--e1); font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--suave); }
 
-.requisito { margin: 0 0 var(--e4); max-width: var(--medida); }
+.requisito { margin: 0 0 var(--e4); }
 .puntaje {
   display: inline-block;
   margin-right: var(--e2);

@@ -228,7 +228,12 @@ function textoPaginas(p) {
 function mostrarResultado(r) {
   const a = r.analisis;
   const c = r.controles;
-  const avisos = [...c.avisos];
+  // Los controles con código ya no tienen bloque propio: solo se muestran, dentro de las alertas, si encontraron algo.
+  const avisosDeControl = [
+    ...c.frasesProhibidas.map((h) => `Frase prohibida que sigue en el texto: "${h.frase}" en ${h.donde}`),
+    ...c.datosNuevos.map((d) => `Dato que no está en tu CV, tu perfil ni la oferta (revisalo): ${d.tipo} "${d.valor}" en ${d.donde}`),
+    ...c.avisos,
+  ];
   const contenido = [
     el('div', { class: 'bloque' },
       el('h3', {}, 'Tu CV'),
@@ -248,20 +253,11 @@ function mostrarResultado(r) {
         el('div', { class: 'nota' }, q.justificacion))),
       el('p', { class: 'etiqueta' }, 'No cubierto'), lista(a.no_cubierto),
       el('p', { class: 'etiqueta' }, 'Sugerencias (no se aplicaron al CV: decidís vos)'), lista(a.sugerencias.map((s) => `${ROTULO[s.tipo]}: ${s.sugerido}. ${s.motivo}${s.respaldo ? ` Respaldo: ${s.respaldo}` : ''}`)),
-      el('p', { class: 'etiqueta' }, 'Alertas'), lista(a.alertas.map((x) => `${x.tipo}: ${x.detalle}`)),
+      el('p', { class: 'etiqueta' }, 'Alertas'), lista([...a.alertas.map((x) => `${x.tipo}: ${x.detalle}`), ...avisosDeControl]),
       el('details', {},
         el('summary', {}, 'Qué priorizó y qué dejó afuera'),
         el('p', { class: 'etiqueta' }, 'Prioriza'), lista(a.decisiones_del_cv.prioriza),
         el('p', { class: 'etiqueta' }, 'Deja afuera'), lista(a.decisiones_del_cv.deja_afuera.map((d) => `${d.elemento}: ${d.motivo}`)))),
-    el('div', { class: 'bloque' },
-      el('h3', {}, 'Qué corrigió la revisión'), lista(r.cambios),
-      r.sinArreglar.length ? [el('p', { class: 'etiqueta' }, 'Sin arreglar'), lista(r.sinArreglar)] : null),
-    el('div', { class: 'bloque' },
-      el('h3', {}, 'Controles automáticos'),
-      el('p', { class: 'nota' }, 'Revisiones hechas por el programa, sin IA.'),
-      el('p', { class: 'etiqueta' }, 'Frases prohibidas que siguen en el texto'), lista(c.frasesProhibidas.map((h) => `"${h.frase}" en ${h.donde}`)),
-      el('p', { class: 'etiqueta' }, 'Datos que no están en tu CV, tu perfil ni la oferta (revisalos)'), lista(c.datosNuevos.map((d) => `${d.tipo} "${d.valor}" en ${d.donde}`)),
-      avisos.length ? [el('p', { class: 'etiqueta' }, 'Avisos'), lista(avisos)] : null),
   ];
   $('resultado').replaceChildren(...contenido.filter(Boolean));
   mostrarPaso('paso-resultado');
