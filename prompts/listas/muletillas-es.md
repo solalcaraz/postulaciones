@@ -3,7 +3,7 @@
 Versión adaptada del checklist en español original (pensado para posts). Última revisión: 2026-10. Estas listas envejecen: revisarlas cada unos 6 meses contra texto generado reciente.
 
 ## 1. Prohibidas (siempre se reescribe)
-**De tu especificación y de `tono.md`:**
+**Frases a evitar:**
 - "apasionada por…", "me apasiona la tecnología", "me apasiona programar"
 - "dinámica", "proactiva", "comprometida", "con gran capacidad de aprendizaje" (sin respaldo)
 - "entusiasmada por la oportunidad", "muy entusiasmada"
@@ -45,7 +45,7 @@ Versión adaptada del checklist en español original (pensado para posts). Últi
 ## 4. Tono
 - Calidez falsa ("espero que estas palabras…").
 - Entusiasmo sin respaldo ("¡una oportunidad increíble!").
-- Registro de traducción: mezcla de voseo y tuteo, o construcciones que nadie dice ("estás realizando" en vez de "estás haciendo"). La carta usa voseo semi-formal según `tono.md`; el CV evita la segunda persona.
+- Registro de traducción: mezcla de voseo y tuteo, o construcciones que nadie dice ("estás realizando" en vez de "estás haciendo"). La carta usa voseo semi-formal; el CV evita la segunda persona.
 
 ## 5. Tics propios de CV
 - Cualidades como adjetivos sueltos ("proactiva", "autodidacta", "detallista") sin un hecho al lado.

@@ -1,5 +1,5 @@
 {
-  "_nota": "Fragmentos de frases prohibidas (de la especificación y de tono.md). La app los busca con código en el texto final, sin gastar cupo. Cada uno se compara al comienzo de una palabra, sin distinguir mayúsculas.",
+  "_nota": "Fragmentos de frases prohibidas. La app los busca con código en el texto final, sin gastar cupo. Cada uno se compara al comienzo de una palabra, sin distinguir mayúsculas.",
   "es": [
     "apasionad",
     "me apasiona",

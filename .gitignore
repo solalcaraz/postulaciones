@@ -1,7 +1,6 @@
 # Secretos
 .env
 .env.*
-!.env.example
 
 # Datos personales: CV, ofertas de prueba y perfil. Nunca al repositorio.
 datos-privados/

@@ -1,6 +1,6 @@
 # Guía de redacción por nivel de idioma
 
-> **Propuesta (Fase 2) para ajustar con la usuaria.** Define qué se permite y qué no al escribir el CV, la carta y la guía en un idioma que no es el nativo. La app incluye en cada llamada solo las "Reglas generales" y la sección del nivel confirmado.
+> Define qué se permite y qué no al escribir el CV, la carta y la guía en un idioma que no es el nativo. La app incluye en cada llamada solo las "Reglas generales" y la sección del nivel confirmado.
 
 ## Reglas generales
 - El texto se escribe **a ese nivel o por debajo, nunca por encima**, y nunca "como nativa" si el nivel no lo es.
@@ -10,7 +10,7 @@
 - **Sin modismos ni frases hechas** en ningún nivel por debajo de C1.
 - Una idea por oración. En las viñetas del CV, el verbo va primero.
 - Si la oferta pide un nivel mayor, no se lo disimula: va al panel como "no cubierto".
-- Esta guía es para el idioma de salida. Si el idioma es el nativo (español), no hay tope de nivel y rigen las demás reglas (`tono.md`, revisión anti-IA).
+- Esta guía es para el idioma de salida. Si el idioma es el nativo (español), no hay tope de nivel y rigen las demás reglas (la voz de la carta y la revisión anti-IA).
 
 ## A2
 - **Oraciones:** de 5 a 10 palabras.
@@ -44,4 +44,4 @@
 
 ## Nativo
 - Sin tope de nivel.
-- En español se aplican la voz de `tono.md` y la revisión anti-IA: sin muletillas ni frases de plantilla.
+- En español se aplica la revisión anti-IA: sin muletillas ni frases de plantilla.

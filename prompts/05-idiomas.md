@@ -1,6 +1,6 @@
 # Prompt 05: idiomas del CV y de la oferta
 
-> Borrador v0 (Fase 2). Es la primera llamada: lee solo el CV y la oferta, y devuelve los niveles de idioma para que la candidata los confirme en la pantalla antes de generar.
+> Es la primera llamada: lee solo el CV y la oferta, y devuelve los niveles de idioma para que la candidata los confirme en la pantalla antes de generar.
 
 ## Qué hacés
 1. **Idiomas del CV.** Listá cada idioma que figure en `<cv>` con el nivel **tal cual está escrito** y, si corresponde a una escala común (A1, A2, B1, B2, C1, C2) o a "nativo", esa equivalencia.
