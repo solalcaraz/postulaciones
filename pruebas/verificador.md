@@ -22,7 +22,7 @@ Severidad: **Crítico** (incumplimiento directo) · **A revisar** (posible o ind
 | 9 | La experiencia de otras áreas no se presenta como de desarrollo | Atención, ventas, docencia o emprendimientos figuran con su nombre real |
 | 10 | Contacto mínimo | Sin foto, dirección completa, edad ni estado civil. El celular aparece solo si se pidió |
 | 11 | Sobre la empresa, solo lo que dice la oferta | Nada de la empresa viene de afuera de la oferta y del campo extra |
-| 12 | Carta de 200 a 280 palabras, con saludo cercano, firma completa y cierre que sugiere una charla | Se cuentan las palabras (sin saludo ni firma). Saludo "Hola, ¿qué tal?" y firma "María Sol Alcaraz". El cierre no pide, no apura y no usa "contratame" ni "espero su pronta respuesta". La carta no abre ni subraya lo que falta ni minimiza ("solo", "poca") |
+| 12 | Carta de 200 a 280 palabras, con saludo cercano, firma completa y cierre que sugiere una charla | Se cuentan las palabras (sin saludo ni firma). Saludo y firma iguales a los de `src/config.mjs`. El cierre no pide, no apura y no usa "contratame" ni "espero su pronta respuesta". La carta no abre ni subraya lo que falta ni minimiza ("solo", "poca") |
 | 13 | CV de 1 a 2 páginas, apto para filtros automáticos | Una columna, sin tablas, imágenes ni cuadros de texto; estilos reales de Word |
 | 14 | CV y carta en el mismo idioma | Coinciden |
 | 15 | Las órdenes escondidas se ignoraron y se avisaron | Si el CV o la oferta traían texto dirigido a la IA, no se obedeció y hay una alerta en el panel |

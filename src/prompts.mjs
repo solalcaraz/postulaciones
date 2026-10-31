@@ -2,9 +2,12 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { FIRMA, SALUDO } from './config.mjs';
 
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
-const leer = (ruta) => readFile(join(RAIZ, ruta), 'utf8');
+// Los prompts usan {{FIRMA}}, {{SALUDO_ES}} y {{SALUDO_EN}}; los valores salen de config.mjs.
+const VARIABLES = { '{{FIRMA}}': FIRMA, '{{SALUDO_ES}}': SALUDO.es, '{{SALUDO_EN}}': SALUDO.en };
+const leer = async (ruta) => Object.entries(VARIABLES).reduce((t, [marca, valor]) => t.replaceAll(marca, valor), await readFile(join(RAIZ, ruta), 'utf8'));
 const bloque = (etiqueta, contenido) => `<${etiqueta}>\n${String(contenido).trim()}\n</${etiqueta}>`;
 
 // De la guía por nivel se incluyen solo las reglas generales y la sección del nivel confirmado.

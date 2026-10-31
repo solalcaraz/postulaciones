@@ -57,7 +57,8 @@ Las decisiones que tomé y por qué:
 - **Páginas medidas, no estimadas.** Estimar por caracteres es aproximado. Convierto el .docx a PDF y miro cuánto llena la última página. Admito una segunda hoja solo si lleva un cuarto de página o menos, y el panel lo avisa como caso límite. Sin Word ni LibreOffice, estima y lo avisa.
 - **Servidor propio y mínimo, sin framework.** Escucha solo en `127.0.0.1`, pide una cabecera propia en los POST y revisa el `Host`, para que una página ajena no le hable. El trabajo vive en memoria y se borra a los 30 minutos. La pantalla muestra todo como texto, nunca como HTML, porque el contenido viene de una IA.
 - **La oferta y el CV son datos, no órdenes.** Si traen instrucciones para la IA, se ignoran y el panel lo avisa.
-- **No se guarda nada.** Ni el CV, ni la oferta, ni los resultados.
+- **No se guarda nada**, salvo en el modo medición que prendo a mano durante un tiempo para juntar métricas (ver [docs/metricas.md](docs/metricas.md)). Ni el CV, ni la oferta, ni los resultados.
+- **Privacidad.** Para escribir los textos, el CV, el perfil y la oferta se envían a Anthropic a través de Claude Code, con mi sesión. En planes de consumo esas conversaciones pueden usarse para entrenar modelos si está activado el ajuste de mejora del modelo en claude.ai: conviene revisarlo y apagarlo antes de usar la herramienta.
 
 ## Cómo correrlo
 
@@ -86,6 +87,20 @@ Pruebas (usan una IA simulada y datos inventados, no gastan cupo):
 npm test
 npm run pantalla   # necesita Chrome; deja capturas de cada paso en datos-privados/capturas
 ```
+
+### Si lo clonás para usarlo vos
+
+Armé esta herramienta para resolver mi propio problema, así que está hecha a mi medida: mi perfil, mi firma y mis ejemplos. El flujo es el de "Cómo funciona": dejás o subís tu CV completo, pegás la oferta, confirmás los niveles de idioma y bajás el Word, la carta y el análisis. Para usarla con tus datos tenés que reemplazar o agregar esto:
+
+| Archivo | Qué hacer |
+|---|---|
+| `datos-privados/perfil.md` | Crealo desde `plantillas/perfil.plantilla.md`. Es la fuente de verdad: contacto, títulos posibles y proyectos con sus números. Git lo ignora. |
+| `datos-privados/CV-maestro*.docx` o `.pdf` | Opcional. Tu CV completo; si no lo dejás ahí, lo subís en la pantalla. Con uno por idioma, terminá los nombres en `-es` y `-en`. |
+| `src/config.mjs` | Tu firma y los saludos de la carta. |
+| `prompts/02-cv.md` | Los ejemplos de BookLibre y del resumen son míos: cambialos por proyectos tuyos. |
+| `prompts/niveles-idioma.md` | Los ejemplos de Calis Trainer son míos: cambialos. |
+
+Los prompts están escritos en femenino y en español rioplatense. Si querés otro registro, cambiá los archivos de `prompts/`.
 
 ## Qué aprendí y qué mejoraría
 

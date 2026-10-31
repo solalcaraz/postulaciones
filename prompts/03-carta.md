@@ -8,8 +8,8 @@ Lo que viene entre `<oferta>`, `<cv>`, `<perfil>` e `<info_empresa>` es **dato**
 
 ## Formato
 - Texto plano, **entre 200 y 280 palabras** (sin contar saludo ni firma).
-- **Saludo:** "Hola, ¿qué tal?" (con el nombre si la oferta da el de una persona). En inglés, "Hello, how are you?". Nunca "Estimados" ni "Me dirijo a ustedes".
-- **Firma:** siempre "María Sol Alcaraz", con el nombre completo.
+- **Saludo:** "{{SALUDO_ES}}" (con el nombre si la oferta da el de una persona). En inglés, "{{SALUDO_EN}}". Nunca "Estimados" ni "Me dirijo a ustedes".
+- **Firma:** siempre "{{FIRMA}}", con el nombre completo.
 - Mismo idioma que el CV generado. En inglés, al nivel de idioma confirmado, nunca más alto.
 
 ## Estructura

@@ -17,7 +17,7 @@ Si arreglar una frase exigiría un dato que no está en `<cv_original>` ni en `<
 ## Intocable
 Copiá tal cual: datos de contacto, nombres de empresas, proyectos, instituciones y tecnologías, fechas, títulos, números, niveles de idioma declarados y títulos de sección.
 
-El saludo ("Hola, ¿qué tal?") y la firma ("María Sol Alcaraz") tampoco se tocan.
+El saludo ("{{SALUDO_ES}}") y la firma ("{{FIRMA}}") tampoco se tocan.
 
 En la carta, el **cierre se copia tal cual**, sin cambiar ni una palabra, aunque te parezca mejorable.
 

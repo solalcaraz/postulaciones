@@ -14,13 +14,13 @@ No hay un número mágico. Mi criterio, para que lo definamos juntas:
 - **Tiempo:** dejar pasar al menos 2 semanas después de la última postulación antes de cerrar el conteo, porque las respuestas llegan tarde.
 - **Comparación:** para saber si la herramienta mejora algo, hace falta un punto de partida. Si tenés registro de postulaciones anteriores (cuántas enviaste y cuántas tuvieron respuesta), cargalo abajo. Si no, los resultados se pueden contar pero no comparar.
 
-**Número elegido: ______ postulaciones.** Ventana: del ____ al ____.
+**Número elegido: 30 postulaciones.** Ventana: desde el 31/10/2026 hasta ____.
 
 ## Checklist
 **Antes de empezar**
-- [ ] Definir el número de postulaciones y las fechas de inicio y cierre (arriba).
+- [x] Definir el número de postulaciones y la fecha de inicio (arriba). Falta la fecha de cierre.
 - [ ] Cargar el punto de partida: postulaciones anteriores sin la herramienta y sus respuestas, si existen.
-- [ ] Prender el modo medición (ver "Cómo se guarda" más abajo) con el número elegido.
+- [x] Prender el modo medición (ver "Cómo se guarda" más abajo) con el número elegido.
 - [ ] Definir qué cuenta como "respuesta" y qué como "contacto" (por ejemplo: mail de la empresa, mensaje por LinkedIn, llamado, pedido de entrevista).
 - [ ] Revisar que el ajuste de mejora del modelo en claude.ai esté apagado.
 
