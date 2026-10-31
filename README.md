@@ -18,13 +18,13 @@ La herramienta ataca eso con reglas escritas en los prompts y con controles hech
 
 ![Flujo completo: formulario, confirmación de niveles de idioma, progreso y resultado](docs/demo/flujo.gif)
 
-Es una corrida real, con Claude, mi CV maestro y una oferta de desarrollador de software back-end. Difuminé mi ubicación y mi email, y el nombre de la empresa. En el cuadro de la oferta lo reemplacé por `[empresa]` porque un cuadro de texto no se puede difuminar a medias. Quedan visibles los requisitos, qué hace la empresa y mis datos públicos (LinkedIn y GitHub).
+Es una corrida real, con Claude, mi CV maestro y una oferta de desarrollador de software back-end. Difuminé mi ubicación, mi email y el nombre de la empresa (en el cuadro de la oferta lo reemplacé por `[empresa]`, porque un cuadro de texto no se puede difuminar a medias). La demo muestra el CV y la carta. El análisis de la oferta y las sugerencias que devuelve el sistema quedan fuera de las imágenes.
 
-En esta corrida el CV ocupó una página y un 4 % de la segunda. La herramienta lo marca como caso límite en las alertas, y lo dejé así. El resultado completo está en [docs/demo/resultado.png](docs/demo/resultado.png), el CV en [docs/demo/cv-generado.png](docs/demo/cv-generado.png) y la pantalla en celular en [docs/demo/resultado-celular.png](docs/demo/resultado-celular.png). Las capturas salen de `npm run pantalla` (con `PANTALLA_REAL=1` usa Claude de verdad; los detalles están al principio de [tests/e2e/pantalla.mjs](tests/e2e/pantalla.mjs)).
+En esta corrida el CV ocupó una página y un 4 % de la segunda. La herramienta lo marca como caso límite, y lo dejé así. Las capturas están en [docs/demo](docs/demo) (el CV en [cv-generado.png](docs/demo/cv-generado.png)) y salen de `npm run pantalla`; con `PANTALLA_REAL=1` usa Claude de verdad (los detalles están al principio de [tests/e2e/pantalla.mjs](tests/e2e/pantalla.mjs)).
 
 No hay demo online: la herramienta usa la sesión de Claude Code de mi compu, así que no tiene sentido publicarla en un hosting.
 
-Todavía no tengo métricas de uso real (cuántas postulaciones hice con ella, cuántas tuvieron respuesta). El plan para medirlas está en [docs/metricas.md](docs/metricas.md), con las tablas vacías para completar.
+Empecé a medir el uso real el 31/10/2026, con un objetivo de 30 postulaciones. Todavía no tengo resultados: el plan y las tablas para completar están en [docs/metricas.md](docs/metricas.md).
 
 ## Tecnologías
 
