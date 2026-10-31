@@ -12,14 +12,15 @@ Herramienta **personal** que resuelve el trabajo de adaptar el CV a cada oferta.
 Una IA escribe el contenido y se comporta como una reclutadora con experiencia. Es un proyecto independiente del portfolio.
 
 ## Estado
-Funcionando de punta a punta: lectura de PDF y Word, 3 llamadas a la IA, controles con código, .docx, pantalla local y pruebas automáticas (`npm test`). Se probó con ofertas reales y de ejemplo, en español y en inglés. Pendiente: probar con una oferta real en inglés y juntar métricas de uso real (ver `docs/metricas.md`).
+Funcionando de punta a punta: lectura de PDF y Word, 3 llamadas a la IA, controles con código, .docx, pantalla local y pruebas automáticas (`npm test`). Se probó con ofertas reales y de ejemplo, en español y en inglés. Pendiente: juntar métricas de uso real (ver `docs/metricas.md`). En pausa: probar con una oferta real en inglés (las pruebas en inglés usaron ofertas inventadas).
 
 ## Cómo correrlo
 1. Tener Node, Claude Code con la sesión iniciada (`claude` en una terminal) y `datos-privados/perfil.md` (se parte de `plantillas/perfil.plantilla.md`).
 2. `npm install` (una sola vez).
 3. `npm start`, o doble clic en `Abrir Postulaciones.cmd`. Abre `http://127.0.0.1:4400`. La ventana negra tiene que quedar abierta.
-4. Sin pantalla: `node scripts/postular.mjs --oferta <archivo> --cv <pdf o docx> --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Nombre] [--guia] [--dry]`. Deja el .docx, la carta y el panel en `datos-privados/salidas/`.
-5. Pruebas: `npm test` (sin gastar cupo, con IA simulada). `npm run pantalla` prueba la pantalla en un Chrome real y saca capturas.
+4. **CV maestro:** si en `datos-privados/` hay un archivo `CV-maestro*.docx` o `.pdf`, no hace falta subir el CV. Si se sube uno, manda el subido. Con un maestro por idioma (nombres terminados en `-es` y `-en`) se usa el del idioma del CV a generar; para detectar niveles se usa el español.
+5. Sin pantalla: `node scripts/postular.mjs --oferta <archivo> --cv <pdf o docx> --perfil datos-privados/perfil.md --niveles es=nativo,en=B1 [--celular "11 1234 5678"] [--empresa Nombre] [--guia] [--dry]`. Deja el .docx, la carta y el panel en `datos-privados/salidas/`.
+6. Pruebas: `npm test` (sin gastar cupo, con IA simulada). `npm run pantalla` prueba la pantalla en un Chrome real y saca capturas.
 
 Variables de entorno opcionales: `POSTULA_MODELO` (por defecto `sonnet`), `POSTULA_CLAUDE` (ruta del ejecutable), `POSTULA_PUERTO` (por defecto 4400) y `POSTULA_SOFFICE` (ruta de LibreOffice).
 
@@ -59,7 +60,7 @@ Variables de entorno opcionales: `POSTULA_MODELO` (por defecto `sonnet`), `POSTU
 - **Descartado:** pegar un prompt en un chat y volver a pegar la respuesta; usar la API de Anthropic; diseñar para que otras personas lo usen.
 
 ## Reglas permanentes
-- **No guardar el CV ni las ofertas:** se procesan en memoria y se descartan. Sin base de datos, sin archivos guardados, sin logs con su contenido. Única excepción posible: un modo de medición temporal y explícito (ver `docs/metricas.md`); hoy **no existe**.
+- **No guardar el CV ni las ofertas:** se procesan en memoria y se descartan. Sin base de datos, sin archivos guardados, sin logs con su contenido. Única excepción: el **modo medición** (`src/medicion.mjs`), temporal y explícito. Se prende creando `datos-privados/medicion.json` con `{"objetivo": 30}`. Guarda cada postulación y sus salidas en `datos-privados/mediciones/` hasta llegar al objetivo y después deja de guardar. La pantalla muestra un panel para tildar si la respuesta fue positiva o negativa, hasta que el archivo tenga `"cerrada": true` o se borre. Detalles en `docs/metricas.md`.
 - **No inventar nada** en el CV ni en la carta: experiencia, habilidades, títulos, fechas, empresas, métricas ni logros. Solo se reordena, reformula y prioriza. No inflar el seniority. Lo que la oferta pide y el CV no tiene va al panel como "no cubierto", nunca al CV.
 - Sobre la empresa: solo lo que diga la oferta o el campo de información extra.
 - El texto no puede sonar a generado por IA (voz en `prompts/`), y pasa por una revisión final.
@@ -70,10 +71,10 @@ Variables de entorno opcionales: `POSTULA_MODELO` (por defecto `sonnet`), `POSTU
 
 ## Estructura
 - `prompts/`: instrucciones de cada llamada (`00-comun`, `01-analisis-reclutador`, `02-cv`, `03-carta`, `04-revision-anti-ia`, `05-idiomas`, `06-acortar`), `niveles-idioma.md` y `listas/` (muletillas, palabras simples, frases prohibidas). **Se envían tal cual a la IA**: cambiar una palabra cambia el resultado.
-- `src/`: `ia.mjs` (llama a Claude Code), `prompts.mjs` (arma cada llamada), `postular.mjs` (flujo completo), `esquema/` (formato de las respuestas), `validacion/` (esquema y controles con código), `lectura/` (PDF, Word y contacto del perfil), `docx/` (generar el .docx y medir sus páginas), `panel.mjs` (panel en texto para la terminal).
+- `src/`: `ia.mjs` (llama a Claude Code), `prompts.mjs` (arma cada llamada), `postular.mjs` (flujo completo), `esquema/` (formato de las respuestas), `validacion/` (esquema y controles con código), `lectura/` (PDF, Word, CV maestro y contacto del perfil), `medicion.mjs` (modo medición), `docx/` (generar el .docx y medir sus páginas), `panel.mjs` (panel en texto para la terminal).
 - `app/`: `servidor.mjs`, `iniciar.mjs` y `public/` (la pantalla).
 - `scripts/postular.mjs`: el flujo completo desde la terminal.
-- `tests/`: pruebas automáticas, `ofertas/` (9 ofertas inventadas para casos distintos), `e2e/pantalla.mjs` (pantalla en Chrome real) y `fidelidad.mjs` (compara un CV generado con el maestro; usa `datos-privados/`).
+- `tests/`: pruebas automáticas, `ofertas/` (9 ofertas inventadas para casos distintos), `e2e/pantalla.mjs` (pantalla en Chrome real, con IA simulada o con Claude real; ver el encabezado del archivo) y `fidelidad.mjs` (compara un CV generado con el maestro; usa `datos-privados/`).
 - `pruebas/`: guías para auditar resultados a mano (`verificador.md`, `revision-textos.md`). No corren dentro de la app.
 - `plantillas/`: perfil vacío, sin datos personales.
 - `docs/`: capturas del demo y el plan de métricas.

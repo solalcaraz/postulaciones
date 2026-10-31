@@ -10,7 +10,9 @@ import { crearServidor } from '../../app/servidor.mjs';
 import { generarCv } from '../../src/docx/generar.mjs';
 import { CV_ES, OFERTA, PERFIL, iaPorEsquema } from '../ayudas.mjs';
 
-// Con PANTALLA_REAL=1 usa Claude de verdad, tu perfil y los archivos PANTALLA_CV y PANTALLA_OFERTA (gasta cupo de tu plan). Las dos rutas tienen que ser absolutas: con una relativa, Chrome no adjunta el CV.
+// Con PANTALLA_REAL=1 usa Claude de verdad, tu perfil y el archivo PANTALLA_OFERTA (gasta cupo de tu plan). Si no se pasa PANTALLA_CV, usa el CV maestro de datos-privados.
+// Las rutas tienen que ser absolutas: con una relativa, Chrome no adjunta el CV.
+// PANTALLA_DIFUMINAR="texto1,texto2" difumina esos textos en las capturas (por ejemplo, el nombre de la empresa) y los reemplaza por "[empresa]" en el cuadro de la oferta.
 const real = process.env.PANTALLA_REAL === '1';
 const CHROME = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const capturas = process.argv[2] || 'datos-privados/capturas';
@@ -20,7 +22,8 @@ await mkdir(capturas, { recursive: true });
 
 // Servidor con IA simulada y un perfil de ejemplo.
 await writeFile(join(temporal, 'perfil.md'), PERFIL, 'utf8');
-const rutaCv = real ? process.env.PANTALLA_CV : join(temporal, 'cv-ejemplo.docx');
+const rutaCv = real ? process.env.PANTALLA_CV || null : join(temporal, 'cv-ejemplo.docx');
+const difuminar = (process.env.PANTALLA_DIFUMINAR || '').split(',').map((t) => t.trim()).filter(Boolean);
 if (!real) await writeFile(rutaCv, (await generarCv({ cv: CV_ES, contacto: { nombre: 'Ana Ejemplo' }, idioma: 'es' })).buffer);
 const textoOferta = real ? await readFile(process.env.PANTALLA_OFERTA, 'utf8') : OFERTA + ' Valoramos el trabajo en equipo y la comunicación clara.';
 // Carta inventada, con solo datos del perfil y la oferta de ejemplo, para que las capturas se vean como un resultado real.
@@ -66,7 +69,37 @@ async function esperar(expresion, ms = 20000) {
   while (Date.now() < fin) { if (await evaluar(expresion)) return true; await pausa(150); }
   throw new Error(`No se cumplió a tiempo: ${expresion}`);
 }
+// Envuelve cada aparición de los textos a ocultar en un <span> con desenfoque (no toca lo que ya está difuminado).
+const ocultarTextos = () => evaluar(`(() => {
+  const textos = ${JSON.stringify(difuminar)}.map((t) => t.toLowerCase());
+  const nodos = [];
+  const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  while (caminante.nextNode()) nodos.push(caminante.currentNode);
+  for (const nodo of nodos) {
+    if (nodo.parentElement.dataset.difuminado) continue;
+    const original = nodo.nodeValue;
+    const minusculas = original.toLowerCase();
+    const trozos = [];
+    let desde = 0;
+    while (desde < original.length) {
+      const hallados = textos.map((t) => [minusculas.indexOf(t, desde), t.length]).filter(([pos]) => pos >= 0).sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+      if (!hallados.length) break;
+      const [pos, largo] = hallados[0];
+      if (pos > desde) trozos.push(document.createTextNode(original.slice(desde, pos)));
+      const span = document.createElement('span');
+      span.dataset.difuminado = '1';
+      span.style.filter = 'blur(7px)';
+      span.textContent = original.slice(pos, pos + largo);
+      trozos.push(span);
+      desde = pos + largo;
+    }
+    if (!trozos.length) continue;
+    if (desde < original.length) trozos.push(document.createTextNode(original.slice(desde)));
+    nodo.replaceWith(...trozos);
+  }
+})()`);
 async function captura(nombre, ancho = 1000) {
+  if (difuminar.length) await ocultarTextos();
   const { result } = await cdp('Runtime.evaluate', { expression: 'document.documentElement.scrollHeight', returnByValue: true });
   await cdp('Emulation.setDeviceMetricsOverride', { width: ancho, height: Math.min(result.result.value + 20, 6000), deviceScaleFactor: 1, mobile: ancho < 600 });
   const { result: img } = await cdp('Page.captureScreenshot', { format: 'png' });
@@ -81,24 +114,31 @@ try {
   console.log('1. Formulario cargado');
   await captura('1-formulario');
 
-  // Un error de validación (sin CV) debe mostrarse.
+  // Un error de validación (sin CV) debe mostrarse. Con el CV maestro en datos-privados no hay error: el CV es opcional.
   await evaluar(`document.querySelector('#oferta').value = ${JSON.stringify(textoOferta)}`);
-  await evaluar(`document.querySelector('#continuar').click()`);
-  await esperar(`!document.querySelector('#error').hidden`);
-  console.log('   error sin CV:', await evaluar(`document.querySelector('#error').textContent`));
+  if (!real) {
+    await evaluar(`document.querySelector('#continuar').click()`);
+    await esperar(`!document.querySelector('#error').hidden`);
+    console.log('   error sin CV:', await evaluar(`document.querySelector('#error').textContent`));
+  }
 
-  // Sube el CV, tilda el celular y completa los datos.
-  const { result: raiz } = await cdp('DOM.getDocument');
-  const { result: campo } = await cdp('DOM.querySelector', { nodeId: raiz.root.nodeId, selector: '#cv' });
-  await cdp('DOM.setFileInputFiles', { files: [rutaCv], nodeId: campo.nodeId });
+  // Sube el CV (si no hay uno, se usa el maestro), tilda el celular y completa los datos.
+  if (rutaCv) {
+    const { result: raiz } = await cdp('DOM.getDocument');
+    const { result: campo } = await cdp('DOM.querySelector', { nodeId: raiz.root.nodeId, selector: '#cv' });
+    await cdp('DOM.setFileInputFiles', { files: [rutaCv], nodeId: campo.nodeId });
+  }
   if (!real) {
     await evaluar(`document.querySelector('#usar-celular').click()`);
     await evaluar(`document.querySelector('#celular').value = '11 5555 0000'`);
   }
-  if (real) await evaluar(`document.querySelector('#usar-guia').click()`);
-  await evaluar(`document.querySelector('#empresa').value = 'Empresa'`);
+  if (!real) await evaluar(`document.querySelector('#empresa').value = 'Empresa'`);
   await evaluar(`document.querySelector('#error').hidden = true`);
+  // En la captura, el cuadro de la oferta no muestra los textos ocultos (un cuadro de texto no se puede difuminar a medias).
+  const ofertaVisible = difuminar.reduce((t, palabra) => t.replaceAll(palabra, '[empresa]'), textoOferta);
+  await evaluar(`document.querySelector('#oferta').value = ${JSON.stringify(ofertaVisible)}`);
   await captura('1b-formulario-completo');
+  await evaluar(`document.querySelector('#oferta').value = ${JSON.stringify(textoOferta)}`);
   await evaluar(`document.querySelector('#continuar').click()`);
   await esperar(`!document.querySelector('#paso-niveles').hidden`, real ? 120000 : 20000);
   console.log('2. Niveles detectados. Generar deshabilitado hasta confirmar el inglés (que figura como "intermedio"):', await evaluar(`document.querySelector('#generar').disabled`), '·', await evaluar(`document.querySelector('#falta-nivel').textContent`));
@@ -117,6 +157,7 @@ try {
   const enlace = await evaluar(`document.querySelector('#resultado a.boton').getAttribute('href')`);
   const descarga = await fetch(`http://127.0.0.1:${puerto}${enlace}`);
   console.log('   descarga del .docx:', descarga.status, descarga.headers.get('content-disposition'));
+  if (real) await writeFile(join(capturas, 'cv-generado.docx'), Buffer.from(await descarga.arrayBuffer()));
 
   // El botón Copiar de la carta.
   await evaluar(`window.__copiado = null; navigator.clipboard.writeText = async (t) => { window.__copiado = t; }`);

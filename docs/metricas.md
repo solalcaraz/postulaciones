@@ -20,14 +20,14 @@ No hay un número mágico. Mi criterio, para que lo definamos juntas:
 **Antes de empezar**
 - [ ] Definir el número de postulaciones y las fechas de inicio y cierre (arriba).
 - [ ] Cargar el punto de partida: postulaciones anteriores sin la herramienta y sus respuestas, si existen.
-- [ ] Decidir cómo se guardan las postulaciones durante la medición (ver "Pendiente" más abajo) y dejarlo implementado.
+- [ ] Prender el modo medición (ver "Cómo se guarda" más abajo) con el número elegido.
 - [ ] Definir qué cuenta como "respuesta" y qué como "contacto" (por ejemplo: mail de la empresa, mensaje por LinkedIn, llamado, pedido de entrevista).
 - [ ] Revisar que el ajuste de mejora del modelo en claude.ai esté apagado.
 
 **Durante**
 - [ ] Hacer cada postulación con la herramienta y anotar una fila en el registro.
 - [ ] Anotar cuánto editaste a mano antes de enviar: nada, poco (frases sueltas) o mucho (reescribiste partes).
-- [ ] Anotar la fecha de envío y, cuando llegue, la fecha y el tipo de respuesta. Las que no respondan quedan como "sin respuesta" recién al cerrar.
+- [ ] Anotar la fecha de envío y, cuando llegue, la fecha y el tipo de respuesta. En la pantalla, el panel "Medición" permite tildar si la respuesta fue positiva o negativa. Las que no respondan quedan como "sin respuesta" recién al cerrar.
 - [ ] Anotar cualquier error, mensaje de límite de uso o resultado raro, con la fecha.
 - [ ] Una vez por semana, revisar que el conteo avance.
 
@@ -35,7 +35,7 @@ No hay un número mágico. Mi criterio, para que lo definamos juntas:
 - [ ] Esperar 2 semanas desde la última postulación.
 - [ ] Marcar "sin respuesta" en las que no contestaron.
 - [ ] Completar la tabla de resultados finales.
-- [ ] Apagar el guardado de postulaciones y salidas, y borrar lo guardado que no vaya a conservarse.
+- [ ] Cerrar la medición (`"cerrada": true` en `datos-privados/medicion.json`) y borrar lo guardado que no vaya a conservarse.
 - [ ] Pasar los resultados al README, en "Qué aprendí y qué mejoraría".
 
 ## Resultados finales
@@ -92,9 +92,12 @@ Copiá una fila por postulación. Las columnas de generación salen del panel y 
 | 29 | | | | | | | | | | | | |
 | 30 | | | | | | | | | | | | |
 
-## Pendiente: cómo guardar durante la medición
-Hoy la herramienta **no guarda nada**, a propósito. Para medir hace falta una excepción temporal. Propuesta, sin implementar hasta definir el número:
-- Un **modo medición** que se prende a mano y se apaga solo al llegar al número definido.
-- Mientras está prendido, guarda cada postulación y sus salidas en `datos-privados/mediciones/`, que git ignora. Contiene datos personales: no se sube a ningún lado.
-- Al llegar al número, el modo se apaga solo y la herramienta vuelve a no guardar nada.
-- Al cerrar, se borra lo que no se vaya a conservar.
+## Cómo se guarda
+Por defecto la herramienta **no guarda nada**. El modo medición es la única excepción, y es temporal:
+
+1. **Prenderlo:** crear el archivo `datos-privados/medicion.json` con el número elegido, por ejemplo `{"objetivo": 30}`.
+2. **Mientras guarda:** cada postulación deja una carpeta en `datos-privados/mediciones/` (por ejemplo `001/`) con el CV, la carta, el panel de análisis y la oferta, más una fila en `registro.json` (fecha, minutos, costo estimado, páginas, palabras de la carta, avisos de los controles y la respuesta). La pantalla avisa que el modo está activo y en qué número va.
+3. **Al llegar al objetivo:** deja de guardar postulaciones nuevas. El panel "Medición" de la pantalla sigue, para tildar si la respuesta fue positiva o negativa en cada postulación.
+4. **Cerrar:** poner `"cerrada": true` en `medicion.json` (o borrar el archivo). El panel desaparece y la herramienta vuelve a no guardar nada.
+
+Esa carpeta tiene datos personales, la ignora git y no se sube a ningún lado. El registro tiene los datos técnicos; lo que pasa afuera (fecha de envío, tipo de respuesta) se completa a mano en las tablas de arriba.
